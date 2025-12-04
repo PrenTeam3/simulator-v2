@@ -510,30 +510,14 @@ class PuzzleSimulatorWindow(QMainWindow):
                 # Always prefer puzzle_connections_v2 as the top-level matching image
                 self._step_primary_images["Finding matching puzzle pieces"] = str(connections)
 
-            # Collect detailed matching images
+            # Collect detailed matching images dynamically
             self._matching_detail_images = []
-            for pattern in [
-                "progressive_chain_P0_P1.png",
-                "progressive_chain_P0_P2.png",
-                "progressive_chain_P0_P3.png",
-                "progressive_chain_P1_P2.png",
-                "progressive_chain_P1_P3.png",
-                "progressive_chain_P2_P3.png",
-            ]:
-                path = base / pattern
-                if path.exists():
-                    self._matching_detail_images.append(str(path))
-            for pattern in [
-                "segment_pairs_P0_P1.png",
-                "segment_pairs_P0_P2.png",
-                "segment_pairs_P0_P3.png",
-                "segment_pairs_P1_P2.png",
-                "segment_pairs_P1_P3.png",
-                "segment_pairs_P2_P3.png",
-            ]:
-                path = base / pattern
-                if path.exists():
-                    self._matching_detail_images.append(str(path))
+            # Find all progressive_chain_*.png files
+            for path in sorted(base.glob("progressive_chain_*.png")):
+                self._matching_detail_images.append(str(path))
+            # Find all segment_pairs_*.png files
+            for path in sorted(base.glob("segment_pairs_*.png")):
+                self._matching_detail_images.append(str(path))
 
             # Assembly combined image
             assembly = base / "assembly_steps_combined.png"
