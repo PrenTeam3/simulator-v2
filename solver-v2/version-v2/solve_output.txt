@@ -1,0 +1,761 @@
+
+======================================================================
+PUZZLE SOLVER - Modular Architecture
+======================================================================
+
+
+======================================================================
+PUZZLE SOLVER - Preparation Phase
+======================================================================
+
+Using specified analysis folder: analysis_20251120_100049
+Step 1: Loading analysis data from temp folder...
+Loading: analysis_20251120_100049
+Loading SVG data from: C:\Users\paulg\Documents\PREN-ALGO\PREN-ALGO\version-v2\temp\analysis_20251120_100049\pieces_with_corners_without_helpers.svg
+  Loaded 4 pieces from SVG
+
+============================================================
+PUZZLE ANALYSIS - 20251120_100049
+Image: images/puzzle.jpg
+Pieces: 4
+  P0: 107229px² | Corners: (1 frame)
+  P1: 94482px² | Corners: (1 frame)
+  P2: 133876px² | Corners: (1 frame)
+  P3: 122828px² | Corners: (1 frame)
+============================================================
+
+
+Step 2: Loading SVG visualization...
+Loading SVG visualization from: pieces_with_corners_without_helpers.svg
+
+Step 3: Loading pre-computed segments from SVG analysis...
+  Piece 0: 11 segments
+  Piece 1: 12 segments
+  Piece 2: 9 segments
+  Piece 3: 10 segments
+
+Step 4: Creating initial visualization...
+Saved visualization to: C:\Users\paulg\Documents\PREN-ALGO\PREN-ALGO\version-v2\temp\solver_visualization_output.png
+
+Detailed piece information:
+
+============================================================
+Piece 0: 107229px² | Centroid: (657, 940) | Corners: 11 outer, 0 inner, 1 frame | Segments: 11
+Piece 1: 94482px² | Centroid: (286, 876) | Corners: 12 outer, 0 inner, 1 frame | Segments: 12
+Piece 2: 133876px² | Centroid: (669, 404) | Corners: 9 outer, 0 inner, 1 frame | Segments: 9
+Piece 3: 122828px² | Centroid: (269, 369) | Corners: 10 outer, 0 inner, 1 frame | Segments: 10
+============================================================
+
+
+Detailed segment information:
+
+============================================================
+Piece 0: 11 segments
+  S0: BORDER | 3 points | From (640,724) To (425,921)
+  S1: BORDER | 3 points | From (425,921) To (662,1175)
+  S2: BORDER | 2 points | From (662,1175) To (751,1092)
+  S3: BORDER | 2 points | From (751,1092) To (786,975)
+  S4: NORMAL | 3 points | From (786,975) To (832,1022)
+  S5: NORMAL | 4 points | From (832,1022) To (908,1009)
+  S6: BORDER | 2 points | From (908,1009) To (816,915)
+  S7: BORDER | 2 points | From (816,915) To (815,801)
+  S8: BORDER | 3 points | From (815,801) To (781,780)
+  S9: NORMAL | 3 points | From (781,780) To (709,801)
+  S10: BORDER | 3 points | From (709,801) To (640,724)
+Piece 1: 12 segments
+  S0: BORDER | 2 points | From (202,654) To (169,754)
+  S1: NORMAL | 3 points | From (169,754) To (221,796)
+  S2: NORMAL | 3 points | From (221,796) To (224,838)
+  S3: BORDER | 3 points | From (224,838) To (124,903)
+  S4: BORDER | 3 points | From (124,903) To (93,1025)
+  S5: BORDER | 2 points | From (93,1025) To (175,1050)
+  S6: NORMAL | 5 points | From (175,1050) To (240,1017)
+  S7: NORMAL | 3 points | From (240,1017) To (270,1036)
+  S8: NORMAL | 3 points | From (270,1036) To (275,1083)
+  S9: BORDER | 2 points | From (275,1083) To (348,1108)
+  S10: BORDER | 2 points | From (348,1108) To (464,737)
+  S11: BORDER | 3 points | From (464,737) To (202,654)
+Piece 2: 9 segments
+  S0: BORDER | 2 points | From (599,149) To (461,584)
+  S1: BORDER | 2 points | From (461,584) To (756,677)
+  S2: BORDER | 2 points | From (756,677) To (786,393)
+  S3: BORDER | 2 points | From (786,393) To (860,357)
+  S4: BORDER | 2 points | From (860,357) To (872,276)
+  S5: BORDER | 2 points | From (872,276) To (823,220)
+  S6: BORDER | 2 points | From (823,220) To (844,154)
+  S7: BORDER | 2 points | From (844,154) To (718,183)
+  S8: BORDER | 3 points | From (718,183) To (599,149)
+Piece 3: 10 segments
+  S0: BORDER | 4 points | From (358,140) To (98,173)
+  S1: BORDER | 2 points | From (98,173) To (153,581)
+  S2: BORDER | 2 points | From (153,581) To (233,576)
+  S3: NORMAL | 3 points | From (233,576) To (267,622)
+  S4: NORMAL | 3 points | From (267,622) To (316,609)
+  S5: NORMAL | 3 points | From (316,609) To (339,563)
+  S6: BORDER | 2 points | From (339,563) To (423,551)
+  S7: BORDER | 3 points | From (423,551) To (402,470)
+  S8: BORDER | 2 points | From (402,470) To (451,414)
+  S9: BORDER | 3 points | From (451,414) To (358,140)
+============================================================
+
+
+======================================================================
+Preparation Phase Complete
+======================================================================
+
+
+======================================================================
+EDGE-BASED SOLVING PHASE
+======================================================================
+
+Processing all 4 pieces for edge-based matching
+  - Piece 0: 11 segments
+  - Piece 1: 12 segments
+  - Piece 2: 9 segments
+  - Piece 3: 10 segments
+
+----------------------------------------------------------------------
+EDGE-BASED MATCHING ALGORITHM
+----------------------------------------------------------------------
+
+Step 1: Validating frame corners for all pieces...
+[OK] Piece 0 has 1 frame corner(s)
+[OK] Piece 1 has 1 frame corner(s)
+[OK] Piece 2 has 1 frame corner(s)
+[OK] Piece 3 has 1 frame corner(s)
+
+Found 4 pieces with frame corners
+
+Step 2: Finding segments adjacent to frame corners for all pieces...
+
+Piece 0 - 2 frame-adjacent segments:
+  - Segment ID: 10
+  - Segment ID: 2
+
+Piece 1 - 2 frame-adjacent segments:
+  - Segment ID: 9
+  - Segment ID: 0
+
+Piece 2 - 2 frame-adjacent segments:
+  - Segment ID: 8
+  - Segment ID: 2
+
+Piece 3 - 2 frame-adjacent segments:
+  - Segment ID: 9
+  - Segment ID: 2
+
+----------------------------------------------------------------------
+Step 3: Exporting and visualizing frame-adjacent segment pairs...
+----------------------------------------------------------------------
+
+[OK] Exported segment pair data to: C:\Users\paulg\Documents\PREN-ALGO\PREN-ALGO\version-v2\temp\segment_pairs_debug_data.json
+     Contains 6 piece pair combinations
+     Total segment pairs: 24
+
+Processing segment pairs: Piece 0 <-> Piece 1
+  Piece 0 has 2 frame-adjacent segments
+  Piece 1 has 2 frame-adjacent segments
+  Total pairs to evaluate: 4
+  Saved to: C:\Users\paulg\Documents\PREN-ALGO\PREN-ALGO\version-v2\temp\segment_pairs_P0_P1.png
+
+Processing segment pairs: Piece 0 <-> Piece 2
+  Piece 0 has 2 frame-adjacent segments
+  Piece 2 has 2 frame-adjacent segments
+  Total pairs to evaluate: 4
+  Saved to: C:\Users\paulg\Documents\PREN-ALGO\PREN-ALGO\version-v2\temp\segment_pairs_P0_P2.png
+
+Processing segment pairs: Piece 0 <-> Piece 3
+  Piece 0 has 2 frame-adjacent segments
+  Piece 3 has 2 frame-adjacent segments
+  Total pairs to evaluate: 4
+  Saved to: C:\Users\paulg\Documents\PREN-ALGO\PREN-ALGO\version-v2\temp\segment_pairs_P0_P3.png
+
+Processing segment pairs: Piece 1 <-> Piece 2
+  Piece 1 has 2 frame-adjacent segments
+  Piece 2 has 2 frame-adjacent segments
+  Total pairs to evaluate: 4
+  Saved to: C:\Users\paulg\Documents\PREN-ALGO\PREN-ALGO\version-v2\temp\segment_pairs_P1_P2.png
+
+Processing segment pairs: Piece 1 <-> Piece 3
+  Piece 1 has 2 frame-adjacent segments
+  Piece 3 has 2 frame-adjacent segments
+  Total pairs to evaluate: 4
+  Saved to: C:\Users\paulg\Documents\PREN-ALGO\PREN-ALGO\version-v2\temp\segment_pairs_P1_P3.png
+
+Processing segment pairs: Piece 2 <-> Piece 3
+  Piece 2 has 2 frame-adjacent segments
+  Piece 3 has 2 frame-adjacent segments
+  Total pairs to evaluate: 4
+  Saved to: C:\Users\paulg\Documents\PREN-ALGO\PREN-ALGO\version-v2\temp\segment_pairs_P2_P3.png
+
+[OK] All segment pair processing complete (24 matches found)
+
+----------------------------------------------------------------------
+Step 4: Finding segment chains (max length: 2)...
+----------------------------------------------------------------------
+
+Total individual matches found: 24
+Valid matches: 5
+
+======================================================================
+CHAIN MATCHING DEBUG - Progressive Extension Approach
+======================================================================
+Total individual matches: 24
+Valid individual matches: 5
+  - P0-S10 <-> P1-S0
+  - P0-S2 <-> P2-S8
+  - P1-S0 <-> P2-S8
+  - P1-S9 <-> P3-S2
+  - P2-S2 <-> P3-S9
+
+Attempting progressive extension for match 1/5:
+  Initial: P0-S10 <-> P1-S0
+  Piece 0 has 11 segments
+  Piece 1 has 12 segments
+    Starting progressive extension:
+      Initial match: P0-S10 <-> P1-S0
+      Initial scores: Length=98.8%, Direction=100.0%, Shape=98.6%, Valid=True
+
+    Determining extension directions:
+      [Direction] Current seg: P0-S10
+      [Direction] Frame-touching segments for P0: [0, 1]
+      [Direction] Forward (+1) to S0: FRAME
+      [Direction] Backward (-1) to S9: interior
+      [Direction] Choosing BACKWARD (-1, away from frame)
+      [Direction] Current seg: P1-S0
+      [Direction] Frame-touching segments for P1: [10, 11]
+      [Direction] Forward (+1) to S1: interior
+      [Direction] Backward (-1) to S11: FRAME
+      [Direction] Choosing FORWARD (+1, away from frame)
+      P0 direction: -1
+      P1 direction: +1
+
+    Beginning extensions (max possible: 11):
+
+    Extension step 1 (attempting chain length 2):
+      Next segments: P0-S9, P1-S1
+      Extended chain: P0[10, 9] <-> P1[0, 1]
+      Calculating scores for chain length 2...
+      Scores: Length=96.1%, Direction=19.8%, Shape=98.5%
+      Valid: True
+      Match is VALID - continuing to next extension
+
+    Extension step 2 (attempting chain length 3):
+      Next segments: P0-S8, P1-S2
+      Extended chain: P0[10, 9, 8] <-> P1[0, 1, 2]
+      Calculating scores for chain length 3...
+      Scores: Length=97.9%, Direction=94.5%, Shape=96.9%
+      Valid: True
+      Match is VALID - continuing to next extension
+
+    Extension step 3 (attempting chain length 4):
+      Next segments: P0-S7, P1-S3
+      Extended chain: P0[10, 9, 8, 7] <-> P1[0, 1, 2, 3]
+      Calculating scores for chain length 4...
+      Scores: Length=99.6%, Direction=83.3%, Shape=99.4%
+      Valid: True
+      Match is VALID - continuing to next extension
+
+    Extension step 4 (attempting chain length 5):
+      Next segments: P0-S6, P1-S4
+      Extended chain: P0[10, 9, 8, 7, 6] <-> P1[0, 1, 2, 3, 4]
+      Calculating scores for chain length 5...
+      Scores: Length=99.1%, Direction=87.8%, Shape=99.0%
+      Valid: True
+      Match is VALID - continuing to next extension
+
+    Extension step 5 (attempting chain length 6):
+      Next segments: P0-S5, P1-S5
+      Extended chain: P0[10, 9, 8, 7, 6, 5] <-> P1[0, 1, 2, 3, 4, 5]
+      Calculating scores for chain length 6...
+      Scores: Length=99.7%, Direction=55.2%, Shape=35.6%
+      Valid: False
+      Match became INVALID - stopping (included this invalid match in results)
+
+    Completed: Generated 6 progressive chain(s) (lengths: [1, 2, 3, 4, 5, 6])
+  [OK] Created 6 progressive chain(s)
+    Length 1: P0[10] <-> P1[0]
+    Length 2: P0[10, 9] <-> P1[0, 1]
+    Length 3: P0[10, 9, 8] <-> P1[0, 1, 2]
+    Length 4: P0[10, 9, 8, 7] <-> P1[0, 1, 2, 3]
+    Length 5: P0[10, 9, 8, 7, 6] <-> P1[0, 1, 2, 3, 4]
+    Length 6: P0[10, 9, 8, 7, 6, 5] <-> P1[0, 1, 2, 3, 4, 5]
+
+Attempting progressive extension for match 2/5:
+  Initial: P0-S2 <-> P2-S8
+  Piece 0 has 11 segments
+  Piece 2 has 9 segments
+    Starting progressive extension:
+      Initial match: P0-S2 <-> P2-S8
+      Initial scores: Length=98.2%, Direction=100.0%, Shape=98.2%, Valid=True
+
+    Determining extension directions:
+      [Direction] Current seg: P0-S2
+      [Direction] Frame-touching segments for P0: [0, 1]
+      [Direction] Forward (+1) to S3: interior
+      [Direction] Backward (-1) to S1: FRAME
+      [Direction] Choosing FORWARD (+1, away from frame)
+      [Direction] Current seg: P2-S8
+      [Direction] Frame-touching segments for P2: [0, 1]
+      [Direction] Forward (+1) to S0: FRAME
+      [Direction] Backward (-1) to S7: interior
+      [Direction] Choosing BACKWARD (-1, away from frame)
+      P0 direction: +1
+      P2 direction: -1
+
+    Beginning extensions (max possible: 9):
+
+    Extension step 1 (attempting chain length 2):
+      Next segments: P0-S3, P2-S7
+      Extended chain: P0[2, 3] <-> P2[8, 7]
+      Calculating scores for chain length 2...
+      Scores: Length=96.3%, Direction=69.6%, Shape=99.6%
+      Valid: True
+      Match is VALID - continuing to next extension
+
+    Extension step 2 (attempting chain length 3):
+      Next segments: P0-S4, P2-S6
+      Extended chain: P0[2, 3, 4] <-> P2[8, 7, 6]
+      Calculating scores for chain length 3...
+      Scores: Length=96.4%, Direction=0.0%, Shape=97.2%
+      Valid: True
+      Match is VALID - continuing to next extension
+
+    Extension step 3 (attempting chain length 4):
+      Next segments: P0-S5, P2-S5
+      Extended chain: P0[2, 3, 4, 5] <-> P2[8, 7, 6, 5]
+      Calculating scores for chain length 4...
+      Scores: Length=98.4%, Direction=37.5%, Shape=98.4%
+      Valid: True
+      Match is VALID - continuing to next extension
+
+    Extension step 4 (attempting chain length 5):
+      Next segments: P0-S6, P2-S4
+      Extended chain: P0[2, 3, 4, 5, 6] <-> P2[8, 7, 6, 5, 4]
+      Calculating scores for chain length 5...
+      Scores: Length=91.7%, Direction=60.7%, Shape=17.1%
+      Valid: False
+      Match became INVALID - stopping (included this invalid match in results)
+
+    Completed: Generated 5 progressive chain(s) (lengths: [1, 2, 3, 4, 5])
+  [OK] Created 5 progressive chain(s)
+    Length 1: P0[2] <-> P2[8]
+    Length 2: P0[2, 3] <-> P2[8, 7]
+    Length 3: P0[2, 3, 4] <-> P2[8, 7, 6]
+    Length 4: P0[2, 3, 4, 5] <-> P2[8, 7, 6, 5]
+    Length 5: P0[2, 3, 4, 5, 6] <-> P2[8, 7, 6, 5, 4]
+
+Attempting progressive extension for match 3/5:
+  Initial: P1-S0 <-> P2-S8
+  Piece 1 has 12 segments
+  Piece 2 has 9 segments
+    Starting progressive extension:
+      Initial match: P1-S0 <-> P2-S8
+      Initial scores: Length=85.0%, Direction=100.0%, Shape=89.7%, Valid=True
+
+    Determining extension directions:
+      [Direction] Current seg: P1-S0
+      [Direction] Frame-touching segments for P1: [10, 11]
+      [Direction] Forward (+1) to S1: interior
+      [Direction] Backward (-1) to S11: FRAME
+      [Direction] Choosing FORWARD (+1, away from frame)
+      [Direction] Current seg: P2-S8
+      [Direction] Frame-touching segments for P2: [0, 1]
+      [Direction] Forward (+1) to S0: FRAME
+      [Direction] Backward (-1) to S7: interior
+      [Direction] Choosing BACKWARD (-1, away from frame)
+      P1 direction: +1
+      P2 direction: -1
+
+    Beginning extensions (max possible: 9):
+
+    Extension step 1 (attempting chain length 2):
+      Next segments: P1-S1, P2-S7
+      Extended chain: P1[0, 1] <-> P2[8, 7]
+      Calculating scores for chain length 2...
+      Scores: Length=68.4%, Direction=31.9%, Shape=90.8%
+      Valid: False
+      Match became INVALID - stopping (included this invalid match in results)
+
+    Completed: Generated 2 progressive chain(s) (lengths: [1, 2])
+  [OK] Created 2 progressive chain(s)
+    Length 1: P1[0] <-> P2[8]
+    Length 2: P1[0, 1] <-> P2[8, 7]
+
+Attempting progressive extension for match 4/5:
+  Initial: P1-S9 <-> P3-S2
+  Piece 1 has 12 segments
+  Piece 3 has 10 segments
+    Starting progressive extension:
+      Initial match: P1-S9 <-> P3-S2
+      Initial scores: Length=96.3%, Direction=100.0%, Shape=97.3%, Valid=True
+
+    Determining extension directions:
+      [Direction] Current seg: P1-S9
+      [Direction] Frame-touching segments for P1: [10, 11]
+      [Direction] Forward (+1) to S10: FRAME
+      [Direction] Backward (-1) to S8: interior
+      [Direction] Choosing BACKWARD (-1, away from frame)
+      [Direction] Current seg: P3-S2
+      [Direction] Frame-touching segments for P3: [0, 1]
+      [Direction] Forward (+1) to S3: interior
+      [Direction] Backward (-1) to S1: FRAME
+      [Direction] Choosing FORWARD (+1, away from frame)
+      P1 direction: -1
+      P3 direction: +1
+
+    Beginning extensions (max possible: 10):
+
+    Extension step 1 (attempting chain length 2):
+      Next segments: P1-S8, P3-S3
+      Extended chain: P1[9, 8] <-> P3[2, 3]
+      Calculating scores for chain length 2...
+      Scores: Length=89.5%, Direction=99.0%, Shape=95.6%
+      Valid: True
+      Match is VALID - continuing to next extension
+
+    Extension step 2 (attempting chain length 3):
+      Next segments: P1-S7, P3-S4
+      Extended chain: P1[9, 8, 7] <-> P3[2, 3, 4]
+      Calculating scores for chain length 3...
+      Scores: Length=84.1%, Direction=80.1%, Shape=73.7%
+      Valid: True
+      Match is VALID - continuing to next extension
+
+    Extension step 3 (attempting chain length 4):
+      Next segments: P1-S6, P3-S5
+      Extended chain: P1[9, 8, 7, 6] <-> P3[2, 3, 4, 5]
+      Calculating scores for chain length 4...
+      Scores: Length=98.3%, Direction=91.7%, Shape=97.8%
+      Valid: True
+      Match is VALID - continuing to next extension
+
+    Extension step 4 (attempting chain length 5):
+      Next segments: P1-S5, P3-S6
+      Extended chain: P1[9, 8, 7, 6, 5] <-> P3[2, 3, 4, 5, 6]
+      Calculating scores for chain length 5...
+      Scores: Length=99.0%, Direction=86.7%, Shape=98.0%
+      Valid: True
+      Match is VALID - continuing to next extension
+
+    Extension step 5 (attempting chain length 6):
+      Next segments: P1-S4, P3-S7
+      Extended chain: P1[9, 8, 7, 6, 5, 4] <-> P3[2, 3, 4, 5, 6, 7]
+      Calculating scores for chain length 6...
+      Scores: Length=91.4%, Direction=78.6%, Shape=0.0%
+      Valid: False
+      Match became INVALID - stopping (included this invalid match in results)
+
+    Completed: Generated 6 progressive chain(s) (lengths: [1, 2, 3, 4, 5, 6])
+  [OK] Created 6 progressive chain(s)
+    Length 1: P1[9] <-> P3[2]
+    Length 2: P1[9, 8] <-> P3[2, 3]
+    Length 3: P1[9, 8, 7] <-> P3[2, 3, 4]
+    Length 4: P1[9, 8, 7, 6] <-> P3[2, 3, 4, 5]
+    Length 5: P1[9, 8, 7, 6, 5] <-> P3[2, 3, 4, 5, 6]
+    Length 6: P1[9, 8, 7, 6, 5, 4] <-> P3[2, 3, 4, 5, 6, 7]
+
+Attempting progressive extension for match 5/5:
+  Initial: P2-S2 <-> P3-S9
+  Piece 2 has 9 segments
+  Piece 3 has 10 segments
+    Starting progressive extension:
+      Initial match: P2-S2 <-> P3-S9
+      Initial scores: Length=98.7%, Direction=100.0%, Shape=91.3%, Valid=True
+
+    Determining extension directions:
+      [Direction] Current seg: P2-S2
+      [Direction] Frame-touching segments for P2: [0, 1]
+      [Direction] Forward (+1) to S3: interior
+      [Direction] Backward (-1) to S1: FRAME
+      [Direction] Choosing FORWARD (+1, away from frame)
+      [Direction] Current seg: P3-S9
+      [Direction] Frame-touching segments for P3: [0, 1]
+      [Direction] Forward (+1) to S0: FRAME
+      [Direction] Backward (-1) to S8: interior
+      [Direction] Choosing BACKWARD (-1, away from frame)
+      P2 direction: +1
+      P3 direction: -1
+
+    Beginning extensions (max possible: 9):
+
+    Extension step 1 (attempting chain length 2):
+      Next segments: P2-S3, P3-S8
+      Extended chain: P2[2, 3] <-> P3[9, 8]
+      Calculating scores for chain length 2...
+      Scores: Length=98.9%, Direction=44.9%, Shape=98.5%
+      Valid: True
+      Match is VALID - continuing to next extension
+
+    Extension step 2 (attempting chain length 3):
+      Next segments: P2-S4, P3-S7
+      Extended chain: P2[2, 3, 4] <-> P3[9, 8, 7]
+      Calculating scores for chain length 3...
+      Scores: Length=99.5%, Direction=97.8%, Shape=99.4%
+      Valid: True
+      Match is VALID - continuing to next extension
+
+    Extension step 3 (attempting chain length 4):
+      Next segments: P2-S5, P3-S6
+      Extended chain: P2[2, 3, 4, 5] <-> P3[9, 8, 7, 6]
+      Calculating scores for chain length 4...
+      Scores: Length=98.4%, Direction=61.5%, Shape=27.5%
+      Valid: False
+      Match became INVALID - stopping (included this invalid match in results)
+
+    Completed: Generated 4 progressive chain(s) (lengths: [1, 2, 3, 4])
+  [OK] Created 4 progressive chain(s)
+    Length 1: P2[2] <-> P3[9]
+    Length 2: P2[2, 3] <-> P3[9, 8]
+    Length 3: P2[2, 3, 4] <-> P3[9, 8, 7]
+    Length 4: P2[2, 3, 4, 5] <-> P3[9, 8, 7, 6]
+
+======================================================================
+CHAIN MATCHING SUMMARY: Found 5 progressive chain set(s)
+======================================================================
+
+Found 5 progressive chain set(s)
+
+----------------------------------------------------------------------
+Step 5: Processing progressive chains...
+----------------------------------------------------------------------
+
+Processing progressive chains: P0 <-> P1
+  Chain lengths: [1, 2, 3, 4, 5, 6]
+  Saved to: C:\Users\paulg\Documents\PREN-ALGO\PREN-ALGO\version-v2\temp\progressive_chain_P0_P1.png
+
+Processing progressive chains: P0 <-> P2
+  Chain lengths: [1, 2, 3, 4, 5]
+  Saved to: C:\Users\paulg\Documents\PREN-ALGO\PREN-ALGO\version-v2\temp\progressive_chain_P0_P2.png
+
+Processing progressive chains: P1 <-> P2
+  Chain lengths: [1, 2]
+  Saved to: C:\Users\paulg\Documents\PREN-ALGO\PREN-ALGO\version-v2\temp\progressive_chain_P1_P2.png
+
+Processing progressive chains: P1 <-> P3
+  Chain lengths: [1, 2, 3, 4, 5, 6]
+  Saved to: C:\Users\paulg\Documents\PREN-ALGO\PREN-ALGO\version-v2\temp\progressive_chain_P1_P3.png
+
+Processing progressive chains: P2 <-> P3
+  Chain lengths: [1, 2, 3, 4]
+  Saved to: C:\Users\paulg\Documents\PREN-ALGO\PREN-ALGO\version-v2\temp\progressive_chain_P2_P3.png
+
+[OK] All chain processing complete
+
+----------------------------------------------------------------------
+Step 6: Determining best connections for puzzle assembly...
+----------------------------------------------------------------------
+
+Found 5 valid chain matches
+
+Selected connections (2 per piece):
+
+======================================================================
+PUZZLE ASSEMBLY GUIDE - SELECTED CONNECTIONS
+======================================================================
+
+Piece 0:
+  Connection 1 (Side B): -> Piece 1
+    Segments: P0[10, 9, 8, 7, 6] <-> P1[0, 1, 2, 3, 4]
+    Chain length: 5 segments
+    Shape match: 99.0%
+  Connection 2 (Side A): -> Piece 2
+    Segments: P0[2, 3, 4, 5] <-> P2[8, 7, 6, 5]
+    Chain length: 4 segments
+    Shape match: 98.4%
+
+Piece 1:
+  Connection 1 (Side A): -> Piece 0
+    Segments: P0[10, 9, 8, 7, 6] <-> P1[0, 1, 2, 3, 4]
+    Chain length: 5 segments
+    Shape match: 99.0%
+  Connection 2 (Side B): -> Piece 3
+    Segments: P1[9, 8, 7, 6, 5] <-> P3[2, 3, 4, 5, 6]
+    Chain length: 5 segments
+    Shape match: 98.0%
+
+Piece 2:
+  Connection 1 (Side B): -> Piece 0
+    Segments: P0[2, 3, 4, 5] <-> P2[8, 7, 6, 5]
+    Chain length: 4 segments
+    Shape match: 98.4%
+  Connection 2 (Side A): -> Piece 3
+    Segments: P2[2, 3, 4] <-> P3[9, 8, 7]
+    Chain length: 3 segments
+    Shape match: 99.4%
+
+Piece 3:
+  Connection 1 (Side A): -> Piece 1
+    Segments: P1[9, 8, 7, 6, 5] <-> P3[2, 3, 4, 5, 6]
+    Chain length: 5 segments
+    Shape match: 98.0%
+  Connection 2 (Side B): -> Piece 2
+    Segments: P2[2, 3, 4] <-> P3[9, 8, 7]
+    Chain length: 3 segments
+    Shape match: 99.4%
+
+======================================================================
+Summary: 4 connections selected for puzzle assembly
+======================================================================
+
+Step 6.5: Creating connections visualization dialog...
+  Saved connections visualization to: C:\Users\paulg\Documents\PREN-ALGO\PREN-ALGO\version-v2\temp\puzzle_connections_v2.png
+
+======================================================================
+IMAGE VIEWER CONTROLS
+======================================================================
+Mouse Wheel:  Zoom in/out
+Mouse Drag:   Pan around image
+Press any key to close
+======================================================================
+
+
+======================================================================
+PUZZLE ASSEMBLY PHASE
+======================================================================
+
+
+Starting assembly with 4 pieces
+
+----------------------------------------------------------------------
+Step 1: Calculating centroids and chain endpoints for all pieces...
+----------------------------------------------------------------------
+  Piece 0: centroid at (657.1, 939.9)
+  Piece 1: centroid at (285.7, 876.0)
+  Piece 2: centroid at (669.4, 403.5)
+  Piece 3: centroid at (269.0, 369.4)
+    Chain to P1: Blue=(640.0,724.0), Red=(908.0,1009.0)
+    Chain to P2: Blue=(662.0,1175.0), Red=(908.0,1009.0)
+    Chain to P0: Blue=(202.0,654.0), Red=(93.0,1025.0)
+    Chain to P3: Blue=(348.0,1108.0), Red=(93.0,1025.0)
+    Chain to P0: Blue=(599.0,149.0), Red=(872.0,276.0)
+    Chain to P3: Blue=(756.0,677.0), Red=(872.0,276.0)
+    Chain to P1: Blue=(153.0,581.0), Red=(423.0,551.0)
+    Chain to P2: Blue=(358.0,140.0), Red=(423.0,551.0)
+
+[OK] Step 1 complete - centroids and chain endpoints calculated for all pieces
+
+----------------------------------------------------------------------
+Step 2: Normalizing piece orientations (axis alignment)...
+----------------------------------------------------------------------
+  Piece 0: rotation = 132.5° (frame edges at 137.5° and 47.0°)
+  Piece 1: rotation = 72.6° (frame edges at -72.6° and -162.4°)
+  Piece 2: rotation = -17.5° (frame edges at 107.6° and 17.5°)
+  Piece 3: rotation = 97.2° (frame edges at 172.8° and 82.3°)
+
+[OK] Step 2 complete - all pieces normalized to axis alignment
+
+----------------------------------------------------------------------
+Step 3: Finding the best anchor piece...
+----------------------------------------------------------------------
+  Piece 0: 2 connections, total score = 197.4
+    -> P1 (side B): 99.0% (chain len: 5)
+    -> P2 (side A): 98.4% (chain len: 4)
+  Piece 1: 2 connections, total score = 196.9
+    -> P0 (side A): 99.0% (chain len: 5)
+    -> P3 (side B): 98.0% (chain len: 5)
+  Piece 2: 2 connections, total score = 197.8
+    -> P0 (side B): 98.4% (chain len: 4)
+    -> P3 (side A): 99.4% (chain len: 3)
+  Piece 3: 2 connections, total score = 197.4
+    -> P1 (side A): 98.0% (chain len: 5)
+    -> P2 (side B): 99.4% (chain len: 3)
+
+[SELECTED] Anchor piece: P2 with total score 197.8
+  This piece has the strongest connections and will be placed first
+
+[OK] Step 3 complete - anchor piece selected
+
+----------------------------------------------------------------------
+Step 4: Positioning anchor piece at origin...
+----------------------------------------------------------------------
+  Anchor piece: P2
+  Frame corner at: (524.9, 638.3)
+  Target position: (100.0, 100.0)
+  Translation: (-424.9, -538.3)
+  Checking edge directions after placement...
+  Found correct orientation: +0° rotation needed
+    Edge directions: -89.9° and 0.0°
+  Final centroid: (244.5, -134.8)
+  Final rotation: -17.5°
+
+[OK] Step 4 complete - anchor piece positioned at origin
+
+----------------------------------------------------------------------
+Step 5: Placing second piece (iterative placement)...
+----------------------------------------------------------------------
+
+  Placing next piece: P3
+  Connected to anchor P2 via chain:
+    Chain length: 3 segments
+    Shape score: 99.4%
+    Segments: P2[2, 3, 4] <-> P3[9, 8, 7]
+
+  Step 1: Getting red/blue dots for anchor piece (P2)...
+    Blue dot (B1) at: (409.3, 100.0)
+    Red dot (R1) at: (399.4, -317.3)
+
+  Step 2: Getting red/blue dots for next piece (P3)...
+    Blue dot (B2) at: (485.4, 486.6)
+    Red dot (R2) at: (69.5, 499.3)
+
+  Step 3: Aligning chains (B2->B1, R2->R1)...
+    Translation: (-76.1, -386.6)
+    After translation - B2: (409.3, 100.0)
+    After translation - R2: (-6.6, 112.7)
+    Rotation angle: -269.6°
+    After rotation - B2 (should match B1): (409.3, 100.0)
+    After rotation - R2 (should match R1): (399.4, -316.0)
+    Target R1: (399.4, -317.3)
+    Final centroid: (528.0, -115.6)
+    Final rotation: -172.4°
+
+[OK] Step 5 complete - second piece placed
+
+----------------------------------------------------------------------
+Step 6: Placing third piece (second connection to anchor)...
+----------------------------------------------------------------------
+
+2 pieces placed, 2 remaining
+
+  Placing piece P0
+  Connected to P2 (already placed) via chain:
+    Chain length: 4 segments
+    Shape score: 98.4%
+    Segments: P0[2, 3, 4, 5] <-> P2[8, 7, 6, 5]
+    Aligned P0 to P2
+    Final centroid: (252.8, -535.8)
+    Final rotation: 41.5°
+
+[OK] Step 6 complete - third piece placed
+
+----------------------------------------------------------------------
+Step 7: Placing fourth piece (final piece)...
+----------------------------------------------------------------------
+
+3 pieces placed, 1 remaining
+  Considering connections to child pieces: [3, 0]
+
+  Placing piece P1
+  Connected to P0 (child piece) via chain:
+    Chain length: 5 segments
+    Shape score: 99.0%
+    Segments: P0[10, 9, 8, 7, 6] <-> P1[0, 1, 2, 3, 4]
+    Aligned P1 to P0
+    Final centroid: (531.6, -524.1)
+    Final rotation: -18.2°
+
+[OK] Step 7 complete - fourth piece placed
+
+----------------------------------------------------------------------
+Step 8: Final assembly summary...
+----------------------------------------------------------------------
+
+4/4 pieces successfully placed
+
+[OK] Assembly visualization saved to: C:\Users\paulg\Documents\PREN-ALGO\PREN-ALGO\version-v2\temp\assembly_steps_combined.png
+
+======================================================================
+Puzzle solving complete
+======================================================================
+
