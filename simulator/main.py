@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 """
-PySide6 GUI for visualizing the solver-v2/version-v2 puzzle solving pipeline.
+PySide6 GUI for visualizing the solver-v2 puzzle solving pipeline.
 
 Usage (from project root):
     python -m simulator.main
@@ -37,18 +37,18 @@ from PySide6.QtWidgets import (
 
 
 # ---------------------------------------------------------------------------
-# Wire in version-v2 modules regardless of current working directory
+# Wire in solver-v2 modules regardless of current working directory
 # ---------------------------------------------------------------------------
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-V2_ROOT = PROJECT_ROOT / "solver-v2" / "version-v2"
+V2_ROOT = PROJECT_ROOT / "solver-v2"
 
 if str(V2_ROOT) not in sys.path:
     sys.path.insert(0, str(V2_ROOT))
 
 try:
     from analyze import run_analysis  # type: ignore[import]
-    from puzzle_solver_v2.solver import solve_puzzle  # type: ignore[import]
+    from puzzle_solver.solver import solve_puzzle  # type: ignore[import]
 except Exception as import_exc:  # noqa: BLE001
     # Defer raising until GUI shows a clear error dialog
     run_analysis = None  # type: ignore[assignment]
@@ -81,7 +81,7 @@ class PipelineWorker(QThread):
         self._image_path = image_path
         self._solver_algorithm = solver_algorithm
 
-        # version-v2 root directory (contains analyze.py, solve.py, temp/, etc.)
+        # solver-v2 root directory (contains analyze.py, solve.py, temp/, etc.)
         self._v2_root = V2_ROOT
 
     def _emit_log(self, msg: str) -> None:
@@ -98,7 +98,7 @@ class PipelineWorker(QThread):
             return
 
         try:
-            # Ensure analysis and solver run with version-v2 as working directory
+            # Ensure analysis and solver run with solver-v2 as working directory
             os.chdir(self._v2_root)
 
             # Phase 1: Analysis (covers preprocessing + piece extraction)
@@ -112,9 +112,11 @@ class PipelineWorker(QThread):
             )
 
             analysis_dir = self._v2_root / "temp" / temp_folder_name
+            threshold_img = analysis_dir / "threshold.png"
             output_img = analysis_dir / "output.png"
-            if output_img.exists():
-                self.image_ready.emit("Preprocessing image", str(output_img))
+
+            if threshold_img.exists():
+                self.image_ready.emit("Preprocessing image", str(threshold_img))
 
             # Conceptually, analysis also performs piece extraction, so we
             # immediately mark that step as completed as well.
@@ -189,13 +191,13 @@ class PuzzleSimulatorWindow(QMainWindow):
 
     def __init__(self) -> None:
         super().__init__()
-        self.setWindowTitle("Puzzle Solver Simulator - Version v2")
+        self.setWindowTitle("Puzzle Solver Simulator")
         self.resize(1200, 800)
 
         self._project_root = PROJECT_ROOT
         self._v2_root = V2_ROOT
         # Default image in solver-v2/images/
-        self._default_image = str(self._project_root / "solver-v2" / "images" / "puzzle.jpg")
+        self._default_image = str(self._project_root / "images" / "puzzle.jpg")
 
         self._worker: Optional[PipelineWorker] = None
 
@@ -205,8 +207,13 @@ class PuzzleSimulatorWindow(QMainWindow):
         self._assembly_image_path: Optional[str] = None
         self._assembly_frames: List[QPixmap] = []
         self._assembly_index: int = 0
+        self._ready_overlay_image: Optional[str] = None  # Track if showing ready overlay
 
         self._build_ui()
+
+        # Show default image on startup (delayed until window is shown)
+        from PySide6.QtCore import QTimer
+        QTimer.singleShot(0, self._show_default_image_on_startup)
 
         if _IMPORT_ERROR is not None:
             # Inform user immediately if imports failed
@@ -233,10 +240,8 @@ class PuzzleSimulatorWindow(QMainWindow):
 
         # Algorithm selection
         self.algorithm_combo = QComboBox(self)
-        self.algorithm_combo.addItem("Edge Solver V2 (recommended)", userData="edge_v2")
-        self.algorithm_combo.addItem("Edge Solver V1", userData="edge")
-        self.algorithm_combo.addItem("Matrix Solver", userData="matrix")
-        self.algorithm_combo.setToolTip("Select puzzle solving algorithm")
+        self.algorithm_combo.addItem("Solver v2", userData="edge_v2")
+        self.algorithm_combo.setToolTip("Puzzle solving algorithm")
 
         # Run button
         self.run_button = QPushButton("Run Pipeline", self)
@@ -377,14 +382,67 @@ class PuzzleSimulatorWindow(QMainWindow):
         )
         self.image_view.setToolTip(image_path)
 
+    def _show_image_with_ready_overlay(self, image_path: str) -> None:
+        """Show an image with 'Ready to analyze' overlay."""
+        from pathlib import Path
+        img_path = Path(image_path)
+        if not img_path.exists():
+            self.image_view.setText("Image not found\nClick 'Run Pipeline' to start")
+            self._ready_overlay_image = None
+            return
+
+        # Load and create overlay with text
+        pixmap = QPixmap(str(img_path))
+        if pixmap.isNull():
+            self.image_view.setText("Click 'Run Pipeline' to start")
+            self._ready_overlay_image = None
+            return
+
+        # Store that we're showing a ready overlay
+        self._ready_overlay_image = image_path
+
+        # Create a painter to add text overlay
+        from PySide6.QtGui import QPainter, QFont
+        overlay_pixmap = pixmap.copy()
+        painter = QPainter(overlay_pixmap)
+
+        # Semi-transparent background for text
+        painter.fillRect(0, 0, overlay_pixmap.width(), 150, QColor(0, 0, 0, 180))
+
+        # Draw text
+        painter.setPen(QColor(255, 255, 255))
+        font = QFont("Arial", 24, QFont.Bold)
+        painter.setFont(font)
+        painter.drawText(20, 50, "Ready to analyze")
+
+        font_small = QFont("Arial", 14)
+        painter.setFont(font_small)
+        painter.drawText(20, 90, "Click 'Run Pipeline' to start puzzle solving")
+
+        painter.end()
+
+        # Display the image with overlay
+        self.image_view.setPixmap(
+            overlay_pixmap.scaled(
+                self.image_view.size(),
+                Qt.KeepAspectRatio,
+                Qt.SmoothTransformation,
+            )
+        )
+        self.image_view.setToolTip(str(img_path))
+
+    def _show_default_image_on_startup(self) -> None:
+        """Show the default puzzle image with 'Ready to analyze' overlay."""
+        self._show_image_with_ready_overlay(self._default_image)
+
     def _show_startup_import_error(self, error_text: str) -> None:
         QMessageBox.critical(
             self,
             "Import error",
-            "Failed to import version-v2 modules.\n\n"
+            "Failed to import solver-v2 modules.\n\n"
             "Ensure you have the following structure relative to the project root:\n"
-            "  solver-v2/version-v2/analyze.py\n"
-            "  solver-v2/version-v2/puzzle_solver_v2/...\n\n"
+            "  solver-v2/analyze.py\n"
+            "  solver-v2/puzzle_solver/...\n\n"
             f"Underlying error:\n{error_text}",
         )
 
@@ -400,8 +458,8 @@ class PuzzleSimulatorWindow(QMainWindow):
         )
         if file_path:
             self.image_label.setText(file_path)
-            # Preprocessing step should default to showing input image
-            self._step_primary_images["Preprocessing image"] = file_path
+            # Show the selected image with "Ready to analyze" overlay
+            self._show_image_with_ready_overlay(file_path)
 
     def _on_run_clicked(self) -> None:
         if _IMPORT_ERROR is not None:
@@ -440,6 +498,7 @@ class PuzzleSimulatorWindow(QMainWindow):
         self._assembly_image_path = None
         self._assembly_frames = []
         self._assembly_index = 0
+        self._ready_overlay_image = None  # Clear ready overlay when pipeline starts
         self.match_details_button.setEnabled(False)
         self.assembly_prev_button.setEnabled(False)
         self.assembly_next_button.setEnabled(False)
@@ -480,10 +539,10 @@ class PuzzleSimulatorWindow(QMainWindow):
 
         # Remember latest image for this step
         self._step_primary_images[step_name] = image_path
-        # If this step is currently selected, update the view
-        current_item = self.steps_list.currentItem()
-        if current_item is not None and current_item.text().endswith(step_name):
-            self._show_image(image_path)
+
+        # Always show the image when it's ready during pipeline execution
+        # (this ensures each step's visualization is displayed as it completes)
+        self._show_image(image_path)
 
     def _on_pipeline_finished(
         self,
@@ -559,10 +618,15 @@ class PuzzleSimulatorWindow(QMainWindow):
 
         # Choose what to display
         if text == "Preprocessing image":
-            # Always show the starting picture for preprocessing
-            image_path = self.image_label.text().strip()
+            # Show threshold image if available, otherwise show original input
+            image_path = self._step_primary_images.get(text)
             if image_path:
                 self._show_image(image_path)
+            else:
+                # Fallback to original input image if threshold not yet generated
+                fallback_path = self.image_label.text().strip()
+                if fallback_path:
+                    self._show_image(fallback_path)
             return
         if text == "Assembling puzzle":
             # Start at first sub-picture of the assembly
@@ -744,7 +808,11 @@ class PuzzleSimulatorWindow(QMainWindow):
         super().resizeEvent(event)
         # Keep current image scaled when window is resized
         if self.image_view.pixmap() is not None and self.image_view.toolTip():
-            self._show_image(self.image_view.toolTip())
+            # If showing ready overlay, maintain it during resize
+            if self._ready_overlay_image:
+                self._show_image_with_ready_overlay(self._ready_overlay_image)
+            else:
+                self._show_image(self.image_view.toolTip())
 
 
 def main() -> None:

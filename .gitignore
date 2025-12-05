@@ -1,5 +1,5 @@
 # Temporary analysis results
-temp/
+solver-v2/temp/
 temp_results/
 
 # Python cache
