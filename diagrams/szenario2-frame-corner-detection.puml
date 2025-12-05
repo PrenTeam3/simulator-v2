@@ -1,0 +1,44 @@
+@startuml
+title Szenario 2: Erkennung von Rahmen-Ecken
+
+skinparam ParticipantPadding 80
+skinparam BoxPadding 20
+hide footbox
+
+participant "PuzzleAnalyzer" as PA
+participant "CornerDetector" as CD
+participant "Validation" as V
+
+PA -> CD: 1. analyze_piece_corners(piece_contour)
+
+CD -> CD: 2. approx_contour()
+
+loop Adaptive Strictness [max 5 iterations]
+
+    CD -> CD: 3. detect_corners(strictness_level)
+
+    CD -> V: 4. for each corner:\nclassify_corner()
+
+    V -> V: 5. Criteria 1:\nboth_edges_straight?
+
+    V -> V: 6. Criteria 2:\nangle ≈ 90°?
+
+    V -> V: 7. Criteria 3:\ninward_arrow?
+
+    V -> V: 8. Criteria 4:\non_convex_hull?
+
+    V --> CD: 9. corner_type\n(outer/inner/frame)
+
+    CD --> CD: 10. count_frame_corners()
+
+    alt frame_corners == target
+        CD --> PA: 11. corners_list ✓\n(target reached)
+    else frame_corners < target
+        CD -> CD: 12. Reduce strictness\n(strict → balanced → loose)
+    else frame_corners > target
+        CD -> CD: 12. Increase strictness\n(loose → balanced → strict)
+    end
+
+end
+
+@enduml

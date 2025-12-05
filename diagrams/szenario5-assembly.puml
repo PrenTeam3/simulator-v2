@@ -1,0 +1,41 @@
+@startuml
+title Szenario 5: Zusammenbau der Puzzleteile
+
+hide footbox
+
+participant "Input" as IN
+participant "Preparation" as PREP
+participant "Anchor\nSelection" as ANCHOR
+participant "Piece\nPlacement" as PLACE
+participant "Visualization" as VIS
+participant "Output" as OUT
+
+IN -> PREP: edge_solver_results\n(chains, connections)
+
+PREP -> PREP: 1. Calculate\ncentroids & chains
+
+PREP -> PREP: 2. Normalize orientations\n(blue dots → upward)
+
+PREP -> ANCHOR: Prepared pieces
+
+ANCHOR -> ANCHOR: 3. Select anchor piece\n(highest connection score)
+
+ANCHOR -> PLACE: 4. Place anchor at origin\nT₀ = {pos:(0,0), rot:calc}
+
+loop for piece 1 to N-1
+    PLACE -> PLACE: 5. Find best connection\nto placed pieces
+
+    PLACE -> PLACE: 6. Translate:\nblue_dot → anchor_blue_dot
+
+    PLACE -> PLACE: 7. Rotate around blue_dot:\nalign red_dot with anchor_red_dot
+
+    PLACE -> PLACE: Store: Tᵢ = {pos, rot}
+end
+
+PLACE -> VIS: All pieces placed
+
+VIS -> VIS: 8. Generate 8 steps:\n- Centroids\n- Orientations\n- Anchor selection\n- Placements (1-4)\n- Complete assembly
+
+VIS -> OUT: assembly_steps_combined.png
+
+@enduml

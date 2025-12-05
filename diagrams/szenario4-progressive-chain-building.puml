@@ -1,0 +1,44 @@
+@startuml
+title Szenario 4: Erweiterung eines Segment-Paars zur Chain
+
+hide footbox
+
+participant "Input" as IN
+participant "ChainMatcher" as CM
+participant "Extension" as EXT
+participant "Scoring" as SC
+participant "Endpoints" as EP
+participant "ChainMatch" as OUT
+
+IN -> CM: Initial match\nP0 Seg2 ↔ P1 Seg0\n(92/85/100)
+
+CM -> CM: 1. Initialize\nchain=[Seg2↔Seg0]
+
+CM -> EXT: 2. Extend chain
+
+loop try_extend [forward & backward]
+    EXT -> EXT: Get next_segment_id\n(±1 wraparound)
+    EXT -> SC: Align segments
+    SC -> SC: Score combined\n(length/direction/RMSD)
+
+    alt scores ≥ threshold
+        SC -> EXT: ✓ Quality good
+        EXT -> EXT: Extend chain
+    else quality drops
+        SC -> EXT: ✗ Stop
+    end
+end
+
+EXT -> EP: Chain complete\nP0:[1,2,3] ↔ P1:[3,0,1]
+
+alt first segment touches frame
+    EP -> EP: blue=first, red=last
+else last segment touches frame
+    EP -> EP: blue=last, red=first
+end
+
+EP -> OUT: Create ChainMatch\n(ids, segments[], scores, endpoints)
+
+OUT --> CM: ChainMatch ✓\nLength:3, Score:89.7
+
+@enduml
