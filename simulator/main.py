@@ -9,6 +9,7 @@ Usage (from project root):
 
 import os
 import sys
+import subprocess
 import traceback
 from pathlib import Path
 from typing import Optional, Dict, Any, List
@@ -42,6 +43,7 @@ from PySide6.QtWidgets import (
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 V2_ROOT = PROJECT_ROOT / "solver-v2"
+PUZZLESOLVER_ROOT = PROJECT_ROOT / "puzzleSolver"
 
 if str(V2_ROOT) not in sys.path:
     sys.path.insert(0, str(V2_ROOT))
@@ -83,13 +85,122 @@ class PipelineWorker(QThread):
 
         # solver-v2 root directory (contains analyze.py, solve.py, temp/, etc.)
         self._v2_root = V2_ROOT
+        # puzzleSolver root directory (contains main_no_gui.py, temp/, etc.)
+        self._puzzlesolver_root = PUZZLESOLVER_ROOT
 
     def _emit_log(self, msg: str) -> None:
         self.log_message.emit(msg)
 
+    def _run_puzzlesolver_algorithm(self) -> None:
+        """Run the puzzlesolver algorithm using main_no_gui.py."""
+        # Get list of existing temp folders before running
+        temp_base = self._puzzlesolver_root / "temp"
+        if not temp_base.exists():
+            temp_base.mkdir(parents=True, exist_ok=True)
+
+        existing_folders = set()
+        if temp_base.exists():
+            for item in temp_base.iterdir():
+                if item.is_dir() and item.name.startswith("analysis_"):
+                    existing_folders.add(item.name)
+
+        # Phase 1: Preprocessing
+        self.step_started.emit("Preprocessing image")
+        self._emit_log("Running zolver (main_no_gui.py) with -b flag...")
+
+        # Run main_no_gui.py as subprocess
+        main_no_gui_path = self._puzzlesolver_root / "main_no_gui.py"
+        if not main_no_gui_path.exists():
+            raise FileNotFoundError(f"main_no_gui.py not found at {main_no_gui_path}")
+
+        # Change to puzzleSolver directory to run the script
+        original_cwd = os.getcwd()
+        # Ensure image path is absolute
+        image_path_abs = Path(self._image_path).resolve()
+        try:
+            os.chdir(self._puzzlesolver_root)
+            cmd = [sys.executable, "main_no_gui.py", "-b", "-p", str(image_path_abs)]
+            self._emit_log(f"Running command: {' '.join(cmd)}")
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                cwd=str(self._puzzlesolver_root),
+            )
+            if result.returncode != 0:
+                error_output = result.stderr or result.stdout
+                raise RuntimeError(f"main_no_gui.py failed with return code {result.returncode}:\n{error_output}")
+            self._emit_log("Zolver completed successfully")
+        finally:
+            os.chdir(original_cwd)
+
+        # Find the newly created temp folder (most recent one not in existing_folders)
+        new_folders = []
+        if temp_base.exists():
+            for item in temp_base.iterdir():
+                if item.is_dir() and item.name.startswith("analysis_") and item.name not in existing_folders:
+                    new_folders.append((item.stat().st_mtime, item.name))
+
+        if not new_folders:
+            # Fallback: use most recent folder
+            for item in temp_base.iterdir():
+                if item.is_dir() and item.name.startswith("analysis_"):
+                    new_folders.append((item.stat().st_mtime, item.name))
+
+        if not new_folders:
+            raise FileNotFoundError("No analysis folder found in puzzleSolver/temp")
+
+        # Get the most recent folder
+        new_folders.sort(reverse=True)
+        temp_folder_name = new_folders[0][1]
+        analysis_dir = temp_base / temp_folder_name
+
+        # Phase 1: Preprocessing - use binarized_treshold_filled.png
+        preprocessing_img = analysis_dir / "binarized_treshold_filled.png"
+        if preprocessing_img.exists():
+            self.image_ready.emit("Preprocessing image", str(preprocessing_img))
+        self.step_finished.emit("Preprocessing image")
+
+        # Phase 2: Finding & extracting puzzle pieces - use binarized.png
+        self.step_started.emit("Finding & extracting puzzle pieces")
+        extracting_img = analysis_dir / "binarized.png"
+        if extracting_img.exists():
+            self.image_ready.emit("Finding & extracting puzzle pieces", str(extracting_img))
+        self.step_finished.emit("Finding & extracting puzzle pieces")
+
+        # Phase 3: Finding matching puzzle pieces - use stick001.png
+        self.step_started.emit("Finding matching puzzle pieces")
+        matching_img = analysis_dir / "stick001.png"
+        if matching_img.exists():
+            self.image_ready.emit("Finding matching puzzle pieces", str(matching_img))
+        self.step_finished.emit("Finding matching puzzle pieces")
+
+        # Phase 4: Assembling puzzle - use colored001.png through colored0*.png
+        self.step_started.emit("Assembling puzzle")
+        colored_images = sorted(analysis_dir.glob("colored0*.png"))
+        if colored_images:
+            # Use the first colored image as the primary assembly image
+            assembly_img = colored_images[0]
+            self.image_ready.emit("Assembling puzzle", str(assembly_img))
+        self.step_finished.emit("Assembling puzzle")
+
+        # Signal completion
+        self.pipeline_finished.emit(temp_folder_name, {"algorithm": "zolver"}, "")
+
     def run(self) -> None:
         temp_folder_name: Optional[str] = None
         results: Optional[Dict[str, Any]] = None
+
+        # Handle the zolver algorithm (main_no_gui.py) separately
+        if self._solver_algorithm == "zolver":
+            try:
+                self._run_puzzlesolver_algorithm()
+                return
+            except Exception as exc:  # noqa: BLE001
+                error_msg = f"Zolver algorithm error: {exc}\n\n{traceback.format_exc()}"
+                self._emit_log(error_msg)
+                self.pipeline_finished.emit("", None, error_msg)
+                return
 
         if _IMPORT_ERROR is not None or run_analysis is None or solve_puzzle is None:
             error_msg = f"Import error: {(_IMPORT_ERROR or 'run_analysis/solve_puzzle not available')}"
@@ -241,6 +352,7 @@ class PuzzleSimulatorWindow(QMainWindow):
         # Algorithm selection
         self.algorithm_combo = QComboBox(self)
         self.algorithm_combo.addItem("Solver v2", userData="edge_v2")
+        self.algorithm_combo.addItem("zolver", userData="zolver")
         self.algorithm_combo.setToolTip("Puzzle solving algorithm")
 
         # Run button
@@ -484,7 +596,7 @@ class PuzzleSimulatorWindow(QMainWindow):
             return
 
         algo_code = self.algorithm_combo.currentData()
-        if algo_code not in {"edge_v2", "edge", "matrix"}:
+        if algo_code not in {"edge_v2", "edge", "matrix", "zolver"}:
             QMessageBox.warning(self, "Invalid algorithm", "Please select a valid algorithm.")
             return
 
@@ -554,35 +666,56 @@ class PuzzleSimulatorWindow(QMainWindow):
 
         # Cache paths for step images and details based on the temp folder
         if temp_folder_name:
-            base = self._v2_root / "temp" / temp_folder_name
+            # Determine which temp directory to use based on algorithm
+            algo_code = self.algorithm_combo.currentData()
+            if algo_code == "zolver":
+                base = PUZZLESOLVER_ROOT / "temp" / temp_folder_name
+                # For zolver, images are already set in _run_puzzlesolver_algorithm()
+                # Don't overwrite them here
+            else:
+                base = self._v2_root / "temp" / temp_folder_name
+                # Ensure extracting pieces uses output.png
+                output_img = base / "output.png"
+                if output_img.exists():
+                    self._step_primary_images.setdefault(
+                        "Finding & extracting puzzle pieces", str(output_img)
+                    )
 
-            # Ensure extracting pieces uses output.png
-            output_img = base / "output.png"
-            if output_img.exists():
-                self._step_primary_images.setdefault(
-                    "Finding & extracting puzzle pieces", str(output_img)
-                )
+                # Matching: main view from puzzle_connections_v2.png if present
+                connections = base / "puzzle_connections_v2.png"
+                if connections.exists():
+                    # Always prefer puzzle_connections_v2 as the top-level matching image
+                    self._step_primary_images["Finding matching puzzle pieces"] = str(connections)
 
-            # Matching: main view from puzzle_connections_v2.png if present
-            connections = base / "puzzle_connections_v2.png"
-            if connections.exists():
-                # Always prefer puzzle_connections_v2 as the top-level matching image
-                self._step_primary_images["Finding matching puzzle pieces"] = str(connections)
+            # Collect detailed matching images dynamically (only for solver-v2 algorithms)
+            if algo_code != "zolver":
+                self._matching_detail_images = []
+                # Find all progressive_chain_*.png files
+                for path in sorted(base.glob("progressive_chain_*.png")):
+                    self._matching_detail_images.append(str(path))
+                # Find all segment_pairs_*.png files
+                for path in sorted(base.glob("segment_pairs_*.png")):
+                    self._matching_detail_images.append(str(path))
 
-            # Collect detailed matching images dynamically
-            self._matching_detail_images = []
-            # Find all progressive_chain_*.png files
-            for path in sorted(base.glob("progressive_chain_*.png")):
-                self._matching_detail_images.append(str(path))
-            # Find all segment_pairs_*.png files
-            for path in sorted(base.glob("segment_pairs_*.png")):
-                self._matching_detail_images.append(str(path))
-
-            # Assembly combined image
-            assembly = base / "assembly_steps_combined.png"
-            if assembly.exists():
-                self._assembly_image_path = str(assembly)
-                self._build_assembly_frames()
+            # Assembly combined image (for solver-v2 algorithms)
+            if algo_code != "zolver":
+                assembly = base / "assembly_steps_combined.png"
+                if assembly.exists():
+                    self._assembly_image_path = str(assembly)
+                    self._build_assembly_frames()
+            else:
+                # For zolver, use colored0*.png images as assembly frames
+                colored_images = sorted(base.glob("colored0*.png"))
+                if colored_images:
+                    # Store paths for assembly navigation
+                    self._assembly_image_path = str(colored_images[0])
+                    # Build frames from colored images
+                    self._assembly_frames = []
+                    for img_path in colored_images:
+                        pixmap = QPixmap(str(img_path))
+                        if not pixmap.isNull():
+                            self._assembly_frames.append(pixmap)
+                    self._assembly_index = 0
 
         if error:
             QMessageBox.critical(
@@ -633,6 +766,11 @@ class PuzzleSimulatorWindow(QMainWindow):
             if self._assembly_frames:
                 self._assembly_index = 0
                 self._show_assembly_frame()
+            else:
+                # Fallback: try to show the primary image if frames aren't available
+                image_path = self._step_primary_images.get(text)
+                if image_path:
+                    self._show_image(image_path)
             return
 
         image_path = self._step_primary_images.get(text)

@@ -4,16 +4,28 @@ import multiprocessing as mp
 import os
 import sys
 import tempfile
+from datetime import datetime
 
 import matplotlib.pyplot as plt
 
 from Puzzle.Puzzle import Puzzle
 
 if __name__ == '__main__':
-    # Create and use temporary directory
-    temp_dir = tempfile.TemporaryDirectory()
-    os.environ["ZOLVER_TEMP_DIR"] = temp_dir.name
-    atexit.register(temp_dir.cleanup)
+    # Create timestamped subfolder for this analysis run
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    analysis_folder = f"analysis_{timestamp}"
+    
+    # Create temp folder if it doesn't exist
+    temp_base = "temp"
+    if not os.path.exists(temp_base):
+        os.makedirs(temp_base)
+    
+    # Create timestamped subfolder inside temp
+    analysis_path = os.path.join(temp_base, analysis_folder)
+    os.makedirs(analysis_path, exist_ok=True)
+    
+    os.environ["ZOLVER_TEMP_DIR"] = analysis_path
+    print(f"Images will be saved to: {os.path.abspath(analysis_path)}")
 
     # Parse arguments
     parser = argparse.ArgumentParser(description="Solve Puzzles!")

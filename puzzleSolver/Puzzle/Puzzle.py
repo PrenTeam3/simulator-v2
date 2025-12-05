@@ -868,8 +868,12 @@ class Puzzle:
         :param path_colored: Path used to export the colored image
         :return: the best edge found in the bloc
         """
-        if not (self.viewer and display):
-            return
+        # Save images if:
+        # 1. No viewer (command-line mode) - always save
+        # 2. Viewer exists and display=True (GUI mode)
+        if self.viewer and not display:
+            return  # GUI mode but display=False, don't save
+        # Otherwise, save the images
 
         minX, minY, maxX, maxY = self.get_bbox()
         colored_img = np.zeros((maxX - minX, maxY - minY, 3))
@@ -912,10 +916,16 @@ class Puzzle:
                             border_img[x, y, 1] = rgb[1]
                             border_img[x, y, 2] = rgb[0]
                 cv2.imwrite(path_contour, border_img)
-                self.viewer.addImage(name_contour, path_contour, display=False)
+                if self.viewer:
+                    self.viewer.addImage(name_contour, path_contour, display=False)
+                elif self.black_only:
+                    self.log(f"[BLACK_ONLY] Saved contour image: {path_contour}")
 
         cv2.imwrite(path_colored, colored_img)
-        self.viewer.addImage(name_colored, path_colored)
+        if self.viewer:
+            self.viewer.addImage(name_colored, path_colored)
+        elif self.black_only:
+            self.log(f"[BLACK_ONLY] Saved colored image: {path_colored}")
 
     def compute_possible_size(self, nb_piece, nb_border) -> list[tuple]:
         """

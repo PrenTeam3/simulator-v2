@@ -1,5 +1,6 @@
 # Temporary analysis results
 solver-v2/temp/
+puzzleSolver/temp/
 temp_results/
 
 # Python cache
