@@ -1,6 +1,9 @@
 @startuml
 title Szenario 5: Zusammenbau der Puzzleteile
 
+' Breite erzwingen
+skinparam ParticipantPadding 60
+skinparam BoxPadding 10
 hide footbox
 
 participant "Input" as IN
@@ -12,29 +15,38 @@ participant "Output" as OUT
 
 IN -> PREP: edge_solver_results\n(chains, connections)
 
-PREP -> PREP: 1. Calculate\ncentroids & chains
-
-PREP -> PREP: 2. Normalize orientations\n(blue dots → upward)
+' Schritte 1 & 2 zusammengefasst
+PREP -> PREP: 1. Calc centroids &\n2. Normalize (blue dots ↑)
 
 PREP -> ANCHOR: Prepared pieces
 
-ANCHOR -> ANCHOR: 3. Select anchor piece\n(highest connection score)
+ANCHOR -> ANCHOR: 3. Select anchor\n(highest score)
 
-ANCHOR -> PLACE: 4. Place anchor at origin\nT₀ = {pos:(0,0), rot:calc}
+ANCHOR -> PLACE: 4. Place anchor at origin\n(T₀ = {pos:0,0, rot:calc})
 
 loop for piece 1 to N-1
-    PLACE -> PLACE: 5. Find best connection\nto placed pieces
+    PLACE -> PLACE: 5. Find best connection\n(to placed pieces)
 
-    PLACE -> PLACE: 6. Translate:\nblue_dot → anchor_blue_dot
-
-    PLACE -> PLACE: 7. Rotate around blue_dot:\nalign red_dot with anchor_red_dot
-
-    PLACE -> PLACE: Store: Tᵢ = {pos, rot}
+    ' HIER SPAREN WIR PLATZ:
+    ' Schritte 6 & 7 (Mathe) in eine Notiz ausgelagert
+    note right of PLACE
+      **Transformation (Schritte 6-7):**
+      6. Translate: blue_dot → anchor_blue_dot
+      7. Rotate: align red_dot with anchor_red_dot
+      Store: Tᵢ = {pos, rot}
+    end note
 end
 
 PLACE -> VIS: All pieces placed
 
-VIS -> VIS: 8. Generate 8 steps:\n- Centroids\n- Orientations\n- Anchor selection\n- Placements (1-4)\n- Complete assembly
+' Schritt 8 (Liste) in eine Notiz ausgelagert
+note right of VIS
+  **8. Generate 8 steps:**
+  - Centroids & Orientations
+  - Anchor selection & Placement
+  - Placements (1-4)
+  - Complete assembly
+end note
 
 VIS -> OUT: assembly_steps_combined.png
 
