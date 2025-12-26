@@ -1,0 +1,86 @@
+@startuml
+title Bausteinsicht Ebene 2 - solver-v2
+
+skinparam componentStyle uml2
+skinparam component {
+  BackgroundColor<<Analyzer>> LightGreen
+  BackgroundColor<<Prep>> LightCyan
+  BackgroundColor<<EdgeSolver>> LightYellow
+  BackgroundColor<<Assembly>> LightPink
+  BorderColor<<Analyzer>> DarkGreen
+  BorderColor<<Prep>> DarkCyan
+  BorderColor<<EdgeSolver>> Orange
+  BorderColor<<Assembly>> Red
+}
+
+' solver-v2: Solver (enthält Analyzer + Solver)
+package "Solver" {
+  ' Puzzle Analyzer
+  package "Puzzle Analyzer\n(Phase 1)" <<Analyzer>> {
+    component [PuzzleAnalyzer\n(Core)] as AnalyzerCore
+    component [CornerDetector] as CornerDet
+    component [SVGVisualizer] as SVGVis
+    component [SVGSmoother] as SVGSmooth
+    component [SVGCornerDrawer] as SVGCorner
+    component [CornerVisualizer] as CornerVis
+    
+    AnalyzerCore --> CornerDet
+    AnalyzerCore --> SVGVis
+    AnalyzerCore --> SVGSmooth
+    AnalyzerCore --> SVGCorner
+    AnalyzerCore --> CornerVis
+  }
+  
+  ' Preparation
+  package "Preparation" <<Prep>> {
+    component [PuzzlePreparer] as Prep
+    component [PuzzleDataLoader] as DataLoader
+    component [SVGDataLoader] as SVGLoader
+    component [ContourSegmenter] as Segmenter
+    component [SolverVisualizer] as PrepVis
+    
+    Prep --> DataLoader
+    Prep --> SVGLoader
+    Prep --> Segmenter
+    Prep --> PrepVis
+    DataLoader --> SVGLoader
+  }
+  
+  ' Edge Solver V2
+  package "Edge Solver V2" <<EdgeSolver>> {
+    component [EdgeSolver] as EdgeSolv
+    component [SegmentFinder] as SegFind
+    component [ChainMatcher] as ChainMatch
+    component [ConnectionSelector] as ConnSelect
+    component [GeometryUtils] as GeomUtils
+    component [EdgeSolverV2Visualizer] as EdgeVis
+    component [SegmentVisualizer] as SegVis
+    component [ChainVisualizer] as ChainVis
+    component [ConnectionVisualizer] as ConnVis
+    
+    EdgeSolv --> SegFind
+    EdgeSolv --> ChainMatch
+    EdgeSolv --> ConnSelect
+    EdgeSolv --> EdgeVis
+    EdgeSolv --> GeomUtils
+    ChainMatch --> GeomUtils
+    EdgeVis --> SegVis
+    EdgeVis --> ChainVis
+    EdgeVis --> GeomUtils
+  }
+  ' solver-v2: Assembly Solver
+    package "Assembly Solver\n(Phase 3)" <<Assembly>> {
+    component [AssemblySolver] as Assembly
+    component [AssemblyVisualizer] as AssemblyVis
+    Assembly --> AssemblyVis
+}
+
+}
+
+
+
+' Abhängigkeiten zwischen Paketen (Pipeline-Ablauf)
+Prep -down-> AnalyzerCore
+EdgeSolv -down-> Prep
+Assembly -down-> EdgeSolv
+@enduml
