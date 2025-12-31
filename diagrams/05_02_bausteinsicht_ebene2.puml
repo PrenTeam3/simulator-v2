@@ -1,86 +1,45 @@
 @startuml
-title Bausteinsicht Ebene 2 - solver-v2
+title Container Diagram - Puzzle Solver V2 (Level 2)
 
+' Style definitions matching your example file
 skinparam componentStyle uml2
 skinparam component {
+  BackgroundColor<<Manager>> LightCyan
   BackgroundColor<<Analyzer>> LightGreen
-  BackgroundColor<<Prep>> LightCyan
-  BackgroundColor<<EdgeSolver>> LightYellow
+  BackgroundColor<<Solver>> LightYellow
   BackgroundColor<<Assembly>> LightPink
+
+  BorderColor<<Manager>> DarkCyan
   BorderColor<<Analyzer>> DarkGreen
-  BorderColor<<Prep>> DarkCyan
-  BorderColor<<EdgeSolver>> Orange
+  BorderColor<<Solver>> Orange
   BorderColor<<Assembly>> Red
 }
 
-' solver-v2: Solver (enthält Analyzer + Solver)
-package "Solver" {
-  ' Puzzle Analyzer
-  package "Puzzle Analyzer\n(Phase 1)" <<Analyzer>> {
-    component [PuzzleAnalyzer\n(Core)] as AnalyzerCore
-    component [CornerDetector] as CornerDet
-    component [SVGVisualizer] as SVGVis
-    component [SVGSmoother] as SVGSmooth
-    component [SVGCornerDrawer] as SVGCorner
-    component [CornerVisualizer] as CornerVis
-    
-    AnalyzerCore --> CornerDet
-    AnalyzerCore --> SVGVis
-    AnalyzerCore --> SVGSmooth
-    AnalyzerCore --> SVGCorner
-    AnalyzerCore --> CornerVis
-  }
-  
-  ' Preparation
-  package "Preparation" <<Prep>> {
-    component [PuzzlePreparer] as Prep
-    component [PuzzleDataLoader] as DataLoader
-    component [SVGDataLoader] as SVGLoader
-    component [ContourSegmenter] as Segmenter
-    component [SolverVisualizer] as PrepVis
-    
-    Prep --> DataLoader
-    Prep --> SVGLoader
-    Prep --> Segmenter
-    Prep --> PrepVis
-    DataLoader --> SVGLoader
-  }
-  
-  ' Edge Solver V2
-  package "Edge Solver V2" <<EdgeSolver>> {
-    component [EdgeSolver] as EdgeSolv
-    component [SegmentFinder] as SegFind
-    component [ChainMatcher] as ChainMatch
-    component [ConnectionSelector] as ConnSelect
-    component [GeometryUtils] as GeomUtils
-    component [EdgeSolverV2Visualizer] as EdgeVis
-    component [SegmentVisualizer] as SegVis
-    component [ChainVisualizer] as ChainVis
-    component [ConnectionVisualizer] as ConnVis
-    
-    EdgeSolv --> SegFind
-    EdgeSolv --> ChainMatch
-    EdgeSolv --> ConnSelect
-    EdgeSolv --> EdgeVis
-    EdgeSolv --> GeomUtils
-    ChainMatch --> GeomUtils
-    EdgeVis --> SegVis
-    EdgeVis --> ChainVis
-    EdgeVis --> GeomUtils
-  }
-  ' solver-v2: Assembly Solver
-    package "Assembly Solver\n(Phase 3)" <<Assembly>> {
-    component [AssemblySolver] as Assembly
-    component [AssemblyVisualizer] as AssemblyVis
-    Assembly --> AssemblyVis
-}
+package "Puzzle Solver V2 System" {
+
+    ' 1. Solver Manager
+    component "Solver Manager\n[File: run.py / solve.py]" as MainManager <<Manager>>
+
+    ' 2. Analyzer Module
+    component "Analyzer Module\n[Package: puzzle_analyzer]" as AnalyzerMod <<Analyzer>>
+
+    ' 3. Solver Module
+    component "Solver Module\n[Package: puzzle_solver]" as SolverMod <<Solver>>
+
+    ' 4. Assembly Module
+    component "Assembly Module\n[Package: assembly_solver]" as AssemblyMod <<Assembly>>
 
 }
 
+' --- Relationships ---
 
+' Manager orchestrates the pipeline
+MainManager -down-> AnalyzerMod : Runs Analysis
+MainManager -down-> SolverMod : Runs Solving
+MainManager -down-> AssemblyMod : Runs Assembly
 
-' Abhängigkeiten zwischen Paketen (Pipeline-Ablauf)
-Prep -down-> AnalyzerCore
-EdgeSolv -down-> Prep
-Assembly -down-> EdgeSolv
+' Data Flow between modules
+SolverMod .up.> AnalyzerMod : Reads Analysis Data
+AssemblyMod .up.> SolverMod : Reads Match Results
+
 @enduml
