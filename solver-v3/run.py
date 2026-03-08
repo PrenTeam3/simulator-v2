@@ -67,3 +67,32 @@ outside_image = draw_outside_segments_debug(a4_image, contours, corners_list, cl
 cv2.imwrite(str(output_dir / "outside_segments.png"), outside_image)
 
 print(f"Outputs saved to: {output_dir}/")
+
+# Step 6: Border solver
+from puzzle_solver.border_solver import (
+    extract_border_info, print_border_info,
+    find_corner_combinations, print_corner_combinations,
+)
+pieces_border = extract_border_info(corners_list, classifications, a4_image.shape[1])
+print_border_info(pieces_border)
+
+results, num_corners = find_corner_combinations(pieces_border, tolerance=15.0)
+print_corner_combinations(results, num_corners)
+
+# Step 7: Place all combinations and check for overlaps
+if results:
+    from puzzle_solver.piece_placer import check_and_draw
+    px_per_mm = a4_image.shape[1] / 297.0
+    valid_placements = []
+    for i, combo in enumerate(results):
+        print(f"\n=== Placing combination {i} ===")
+        placement_img, has_overlap = check_and_draw(combo, corners_list, px_per_mm)
+        cv2.imwrite(str(output_dir / f"placement_{i}.png"), placement_img)
+        print(f"  Result: {'OVERLAP' if has_overlap else 'FITS'}")
+        if not has_overlap:
+            valid_placements.append((i, placement_img))
+    print(f"\n=== {len(valid_placements)} valid placement(s) found ===")
+    for i, img in valid_placements:
+        print(f"  Combination {i} → {output_dir}/placement_{i}.png")
+else:
+    print("\nNo combinations found — cannot place.")
