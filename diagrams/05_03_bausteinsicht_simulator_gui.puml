@@ -1,0 +1,35 @@
+@startuml
+title 5.3 Bausteinsicht - simulator-gui Detaillierte Bausteine
+
+skinparam componentStyle uml2
+skinparam component {
+  BackgroundColor<<GUI>> LightBlue
+  BackgroundColor<<SolverV2>> LightGreen
+  BorderColor<<GUI>> DarkBlue
+  BorderColor<<SolverV2>> DarkGreen
+}
+
+' simulator-gui Komponenten
+package "simulator-gui" <<GUI>> {
+  component [PuzzleSimulatorWindow] as GUI
+  component [PipelineWorker] as Worker
+
+  GUI --> Worker
+}
+
+' solver-v2 (vereinfacht dargestellt)
+package "solver-v2" <<SolverV2>> {
+  component [analyze.py\nrun_analysis()] as AnalyzeEntry
+  component [solver.py\nsolve_puzzle()] as SolverEntry
+}
+
+' Externe Abhängigkeiten
+database "Dateisystem" as FS
+
+' Schnittstellen
+Worker --> AnalyzeEntry
+Worker --> SolverEntry
+AnalyzeEntry --> FS
+SolverEntry --> FS
+
+@enduml

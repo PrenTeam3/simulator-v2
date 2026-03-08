@@ -1,0 +1,50 @@
+@startuml
+title Szenario 4: Erweiterung eines Segment-Paars zur Chain
+
+' Breite erzwingen
+skinparam ParticipantPadding 60
+skinparam BoxPadding 10
+hide footbox
+
+participant "Input" as IN
+participant "ChainMatcher" as CM
+participant "Extension" as EXT
+participant "Scoring" as SC
+participant "Endpoints" as EP
+participant "ChainMatch" as OUT
+
+IN -> CM: Initial match\nP0 Seg2 ↔ P1 Seg0 (92/85/100)
+
+CM -> CM: 1. Initialize chain
+
+CM -> EXT: 2. Extend chain
+
+loop try_extend [forward & backward]
+    ' Schritt: Zusammenfassung von Get Next & Align & Score in einem Call
+    EXT -> SC: Get next (±1) & Score (Length/Dir/RMSD)
+
+    ' Die Entscheidung visualisieren wir kompakt
+    alt scores ≥ threshold
+        SC --> EXT: ✓ Quality good (Extend)
+    else quality drops
+        SC --> EXT: ✗ Stop
+    end
+end
+
+EXT -> EP: Chain complete (P0:[1,2,3] ↔ P1:[3,0,1])
+
+' HIER SPAREN WIR PLATZ:
+' Der Alt-Block für die Dot-Zuweisung wird zur Notiz
+note right of EP
+  **Endpoint Logic:**
+  If first segment touches frame:
+    blue=first, red=last
+  Else:
+    blue=last, red=first
+end note
+
+EP -> OUT: Create ChainMatch\n(ids, segments, scores, endpoints)
+
+OUT --> CM: ChainMatch ✓ (Len:3, Score:89.7)
+
+@enduml
