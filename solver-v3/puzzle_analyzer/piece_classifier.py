@@ -106,7 +106,7 @@ def draw_debug(image, contours, corners_list, classifications):
     mm_per_px_x = 297.0 / w
     mm_per_px_y = 210.0 / h
 
-    for contour, info, cls in zip(contours, corners_list, classifications):
+    for piece_idx, (contour, info, cls) in enumerate(zip(contours, corners_list, classifications)):
         contour_flat = info['contour_flat']
 
         # ── All segments (magenta=straight, grey=curved) ─────────────
@@ -118,7 +118,7 @@ def draw_debug(image, contours, corners_list, classifications):
             dy_mm = (p2[1] - p1[1]) * mm_per_px_y
             length_mm = np.sqrt(dx_mm ** 2 + dy_mm ** 2)
             mid = ((p1[0] + p2[0]) // 2, (p1[1] + p2[1]) // 2)
-            label = f"S{s_idx} {length_mm:.0f}mm"
+            label = f"P{piece_idx}S{s_idx} {length_mm:.0f}mm"
             cv2.putText(out, label, mid, cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 255, 255), 3)
             cv2.putText(out, label, mid, cv2.FONT_HERSHEY_SIMPLEX, 0.45, color, 1)
 
@@ -132,12 +132,15 @@ def draw_debug(image, contours, corners_list, classifications):
             cv2.putText(out, f"O{o_idx}", (pt[0] + 8, pt[1] - 8),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 140, 255), 1)
 
-        # ── Centroid (green circle + C) ──────────────────────────────
+        # ── Centroid — piece number label ────────────────────────────
         if info['centroid']:
             cx, cy = info['centroid']
             cv2.circle(out, (cx, cy), 8, (0, 200, 0), 2)
-            cv2.putText(out, "C", (cx + 10, cy - 8),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 200, 0), 2)
+            piece_label = f"P{piece_idx}"
+            cv2.putText(out, piece_label, (cx + 10, cy - 8),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 4)
+            cv2.putText(out, piece_label, (cx + 10, cy - 8),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 200, 0), 2)
 
         # ── Candidates: zones, bisector, frame corners ───────────────
         for cand in cls['candidates']:
