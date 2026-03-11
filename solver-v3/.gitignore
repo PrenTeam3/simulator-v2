@@ -1,0 +1,4 @@
+output/*
+
+# Except for the .gitignore (or .gitkeep) file inside it
+!output/.gitkeep
