@@ -226,7 +226,7 @@ log_step("6-debug", "Visual placement check (TL + BL per piece)")
 visualize_start_placements(pieces_border, pieces_variants, corners_list, frame, output_dir)
 log_ok("Step 1 placement images saved (dbg_place_P*)")
 
-visualize_second_placements(pieces_border, pieces_variants, corners_list, frame, output_dir)
+visualize_second_placements(pieces_variants, corners_list, frame, output_dir)
 log_ok("Step 2 placement images saved (dbg_step2_P*)")
 
 
