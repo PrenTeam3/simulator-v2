@@ -1,0 +1,10 @@
+don't flip pieces, some pieces are flipped
+
+don't write next canidates like the side candidates, more like what pieces are missing
+
+
+
+--------
+shift tab
+
+plan mode

@@ -30,7 +30,7 @@ _EXPECTED_HORIZ = {
 }
 
 # Side tolerance (mm) — same as tree search
-_SIDE_TOLERANCE = 15.0
+_SIDE_TOLERANCE = 30.0
 
 # For each start position: (side_name, target_mm, closing_corner_pos, fwd_is_horiz)
 _SECOND_CONFIGS = {
@@ -155,3 +155,69 @@ def _place_contour_on_side(
         placed[:, perp] = 2 * side_axis - placed[:, perp]
 
     return placed
+
+
+def _build_candidates(
+    pieces_variants: list,
+    used_idxs:       set,
+    corners_list:    list,
+    px_per_mm:       float,
+    side_name:       str,
+    offset_mm:       float,
+    target:          float,
+    end_pos:         str,
+    fwd_is_horiz:    bool,
+    tolerance:       float,
+) -> list:
+    """Return all next-piece candidates for a given side position.
+
+    Each entry: (pv, v, placed_mm, seg_len, valid, reason, label, seg_h, seg_v, is_corner)
+    Excludes pieces in used_idxs. Applies length and centroid checks.
+    """
+    results = []
+    for pv in pieces_variants:
+        if pv.piece_idx in used_idxs:
+            continue
+        contour = corners_list[pv.piece_idx]['contour_flat']
+        for v in pv.variants:
+            if v.type == 'edge':
+                seg     = v.edges[0]
+                new_len = offset_mm + seg['length_mm']
+                placed  = _place_contour_on_side(contour, seg, side_name, offset_mm, px_per_mm)
+                if new_len < target - tolerance:
+                    valid  = True
+                    reason = f"{offset_mm:.0f}+{seg['length_mm']:.0f}={new_len:.0f}mm  (room={target-new_len:.0f}mm)"
+                else:
+                    valid  = False
+                    reason = f"{offset_mm:.0f}+{seg['length_mm']:.0f}={new_len:.0f}mm  nearly fills side — must be corner"
+                if valid:
+                    cen = np.mean(placed, axis=0)
+                    if not (0 <= cen[0] <= PUZZLE_WIDTH_MM and 0 <= cen[1] <= PUZZLE_HEIGHT_MM):
+                        valid, reason = False, f"centroid ({cen[0]:.0f},{cen[1]:.0f})mm outside frame"
+                results.append((pv, v, placed, seg['length_mm'], valid, reason,
+                                f"P{pv.piece_idx} edge {seg['seg_id']}({seg['length_mm']:.0f}mm)",
+                                None, None, False))
+
+            elif v.type == 'corner' and len(v.edges) >= 2:
+                for ori_n, (fwd, turn) in enumerate(
+                    [(v.edges[0], v.edges[1]), (v.edges[1], v.edges[0])]
+                ):
+                    new_len = offset_mm + fwd['length_mm']
+                    diff    = abs(new_len - target)
+                    sh      = fwd  if fwd_is_horiz else turn
+                    sv      = turn if fwd_is_horiz else fwd
+                    placed  = _place_contour(contour, sh, sv, end_pos, px_per_mm)
+                    if diff <= tolerance:
+                        valid  = True
+                        reason = f"{offset_mm:.0f}+{fwd['length_mm']:.0f}={new_len:.0f}mm  diff={diff:.1f}mm ≤ {tolerance:.0f}mm"
+                    else:
+                        valid  = False
+                        reason = f"{offset_mm:.0f}+{fwd['length_mm']:.0f}={new_len:.0f}mm  diff={diff:.1f}mm > {tolerance:.0f}mm"
+                    if valid:
+                        cen = np.mean(placed, axis=0)
+                        if not (0 <= cen[0] <= PUZZLE_WIDTH_MM and 0 <= cen[1] <= PUZZLE_HEIGHT_MM):
+                            valid, reason = False, f"centroid ({cen[0]:.0f},{cen[1]:.0f})mm outside frame"
+                    results.append((pv, v, placed, fwd['length_mm'], valid, reason,
+                                    f"P{pv.piece_idx}@{end_pos} ori{ori_n} fwd={fwd['seg_id']}({fwd['length_mm']:.0f}mm)",
+                                    sh, sv, True))
+    return results

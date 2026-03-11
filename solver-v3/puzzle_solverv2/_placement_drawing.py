@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 
 from puzzle_solverv2.frame import PUZZLE_WIDTH_MM, PUZZLE_HEIGHT_MM
-from puzzle_solverv2._placement_geometry import _PUZZLE_CORNERS_MM, _corner_transform, _place_contour
+from puzzle_solverv2._placement_geometry import _PUZZLE_CORNERS_MM, _SIDE_TOLERANCE, _corner_transform, _place_contour
 
 
 # ─────────────────────────────────────────────
@@ -168,3 +168,52 @@ def _draw_progress_bar(
     total = seg1_len + seg2_len
     cv2.putText(canvas, f"{total:.0f}mm", (x2 + 4, bar_y + 4),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.35, color2, 1)
+
+
+# ─────────────────────────────────────────────
+#  Legend helpers
+# ─────────────────────────────────────────────
+
+_SIDE_TARGETS = {
+    'top':    PUZZLE_WIDTH_MM,
+    'bottom': PUZZLE_WIDTH_MM,
+    'right':  PUZZLE_HEIGHT_MM,
+    'left':   PUZZLE_HEIGHT_MM,
+}
+
+
+def _side_lines(side_occ: dict) -> list[str]:
+    """Format side-occupancy state as text lines for the legend."""
+    lines = ['FRAME SIDES:']
+    for side in ('top', 'right', 'bottom', 'left'):
+        segs   = side_occ.get(side, [])
+        target = _SIDE_TARGETS[side]
+        if segs:
+            total = sum(s['length_mm'] for s in segs)
+            parts = ' + '.join(f"P{s['piece_idx']}*{s['seg_id']}({s['length_mm']:.0f}mm)" for s in segs)
+            full  = ' [FULL]' if total >= target - _SIDE_TOLERANCE else ''
+            lines.append(f"  {side.upper():<8} {parts} = {total:.0f}/{target:.0f}mm{full}")
+        else:
+            lines.append(f"  {side.upper():<8} --  (target {target:.0f}mm)")
+    return lines
+
+
+def _candidate_lines(candidates: list) -> list[str]:
+    """Format a candidates list as text lines for the legend."""
+    if not candidates:
+        return ['NEXT: (none)']
+    lines = ['NEXT CANDIDATES:']
+    for pv, v, placed, seg_len, valid, reason, label, sh, sv, is_corner in candidates:
+        tag = 'OK ' if valid else 'NO '
+        lines.append(f'  {tag}  {label}  —  {reason}')
+    return lines
+
+
+def _draw_legend(canvas: np.ndarray, ox: int, oy: int, lines: list[str]) -> None:
+    """Draw legend text lines in the bottom padding area."""
+    y = oy + int(PUZZLE_HEIGHT_MM * CANVAS_PX_PER_MM) + 20
+    for line in lines:
+        if y >= canvas.shape[0] - 4:
+            break
+        cv2.putText(canvas, line, (ox, y), cv2.FONT_HERSHEY_SIMPLEX, 0.32, (160, 160, 160), 1)
+        y += 13
