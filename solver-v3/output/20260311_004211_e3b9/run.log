@@ -1,0 +1,504 @@
+
+############################################################
+  Puzzle Solver v2
+  Run ID : 20260311_004211_e3b9
+  Output : output\20260311_004211_e3b9/
+  Image  : ../images/new/test7.jpg
+############################################################
+
+============================================================
+  STEP A1: Detect and rectify A4 area
+============================================================
+  [OK] Image loaded: 4608x2592px
+  [OK] A4 area detected
+  [OK] A4 rectified: 2291x1620px
+  [OUT] a4_rectified.png
+
+============================================================
+  STEP A2: Detect puzzle pieces
+============================================================
+Light background detected (brightness: 170.0)
+Minimum piece area: 5.0 cm² = 29753 px²
+Found 7 total contours, 4 valid pieces
+  [OUT] threshold.png
+  [OK] 4 pieces detected
+  [OUT] pieces_detected.png
+
+============================================================
+  STEP A3: Detect corners per piece
+============================================================
+  Piece 0: 9 outer corners, 3 inner corners, 11 straight segments
+  Piece 1: 9 outer corners, 3 inner corners, 9 straight segments
+  Piece 2: 9 outer corners, 3 inner corners, 11 straight segments
+  Piece 3: 9 outer corners, 3 inner corners, 8 straight segments
+  [OUT] corners_detected.png
+
+============================================================
+  STEP A4: Classify pieces (corner / edge / inner)
+============================================================
+
+============================================================
+[Piece 0] Frame corner detection
+  Outer corners : 9
+  All segments  : 12 (11 straight)
+  Centroid      : (580, 1291)
+  Angle tol     : ±15.0°
+
+  [0] Corner (np.int64(1078), np.int64(1161))
+    C1 Connection   : PASS  (prev=True, next=True)
+    C2 Angle        : PASS  (90.1°, need 75°–105°)
+    C3 Inward arrow : PASS
+    C4 Forbidden zones: FAIL  (zone1 hits=0, zone2 hits=10)
+
+  [1] Corner (np.int64(883), np.int64(1006))
+    C1 Connection   : PASS  (prev=True, next=True)
+    C2 Angle        : PASS  (96.1°, need 75°–105°)
+    C3 Inward arrow : PASS
+    C4 Forbidden zones: FAIL  (zone1 hits=14, zone2 hits=16)
+
+  [2] Corner (np.int64(610), np.int64(1031))
+    C1 Connection   : FAIL  (prev=True, next=False)
+
+  [3] Corner (np.int64(468), np.int64(1201))
+    C1 Connection   : PASS  (prev=True, next=True)
+    C2 Angle        : PASS  (94.8°, need 75°–105°)
+    C3 Inward arrow : FAIL
+
+  [4] Corner (np.int64(451), np.int64(1043))
+    C1 Connection   : PASS  (prev=True, next=True)
+    C2 Angle        : PASS  (90.5°, need 75°–105°)
+    C3 Inward arrow : FAIL
+
+  [5] Corner (np.int64(156), np.int64(1072))
+    C1 Connection   : PASS  (prev=True, next=True)
+    C2 Angle        : PASS  (90.9°, need 75°–105°)
+    C3 Inward arrow : PASS
+    C4 Forbidden zones: FAIL  (zone1 hits=10, zone2 hits=0)
+
+  [6] Corner (np.int64(196), np.int64(1556))
+    C1 Connection   : PASS  (prev=True, next=True)
+    C2 Angle        : PASS  (90.0°, need 75°–105°)
+    C3 Inward arrow : PASS
+    C4 Forbidden zones: PASS  (zone1 hits=0, zone2 hits=0)
+    >>> FRAME CORNER CONFIRMED
+
+  [7] Corner (np.int64(929), np.int64(1496))
+    C1 Connection   : PASS  (prev=True, next=True)
+    C2 Angle        : PASS  (94.0°, need 75°–105°)
+    C3 Inward arrow : PASS
+    C4 Forbidden zones: FAIL  (zone1 hits=0, zone2 hits=18)
+
+  [8] Corner (np.int64(1083), np.int64(1314))
+    C1 Connection   : PASS  (prev=True, next=True)
+    C2 Angle        : PASS  (94.7°, need 75°–105°)
+    C3 Inward arrow : PASS
+    C4 Forbidden zones: FAIL  (zone1 hits=8, zone2 hits=0)
+
+  Result: 1 frame corner(s) confirmed
+============================================================
+
+============================================================
+[Piece 1] Frame corner detection
+  Outer corners : 9
+  All segments  : 12 (9 straight)
+  Centroid      : (1656, 1251)
+  Angle tol     : ±15.0°
+
+  [0] Corner (np.int64(2019), np.int64(985))
+    C1 Connection   : PASS  (prev=True, next=True)
+    C2 Angle        : PASS  (90.8°, need 75°–105°)
+    C3 Inward arrow : PASS
+    C4 Forbidden zones: FAIL  (zone1 hits=14, zone2 hits=32)
+
+  [1] Corner (np.int64(1693), np.int64(853))
+    C1 Connection   : FAIL  (prev=False, next=True)
+
+  [2] Corner (np.int64(1549), np.int64(876))
+    C1 Connection   : PASS  (prev=True, next=True)
+    C2 Angle        : PASS  (93.2°, need 75°–105°)
+    C3 Inward arrow : PASS
+    C4 Forbidden zones: FAIL  (zone1 hits=0, zone2 hits=14)
+
+  [3] Corner (np.int64(1284), np.int64(1076))
+    C1 Connection   : PASS  (prev=True, next=True)
+    C2 Angle        : PASS  (90.4°, need 75°–105°)
+    C3 Inward arrow : PASS
+    C4 Forbidden zones: FAIL  (zone1 hits=27, zone2 hits=0)
+
+  [4] Corner (np.int64(1342), np.int64(1560))
+    C1 Connection   : PASS  (prev=True, next=True)
+    C2 Angle        : PASS  (89.8°, need 75°–105°)
+    C3 Inward arrow : PASS
+    C4 Forbidden zones: PASS  (zone1 hits=0, zone2 hits=0)
+    >>> FRAME CORNER CONFIRMED
+
+  [5] Corner (np.int64(2074), np.int64(1470))
+    C1 Connection   : PASS  (prev=True, next=True)
+    C2 Angle        : PASS  (91.4°, need 75°–105°)
+    C3 Inward arrow : PASS
+    C4 Forbidden zones: FAIL  (zone1 hits=0, zone2 hits=10)
+
+  [6] Corner (np.int64(2059), np.int64(1316))
+    C1 Connection   : FAIL  (prev=True, next=False)
+
+  [7] Corner (np.int64(1898), np.int64(1321))
+    C1 Connection   : FAIL  (prev=False, next=True)
+
+  [8] Corner (np.int64(2036), np.int64(1136))
+    C1 Connection   : FAIL  (prev=False, next=True)
+
+  Result: 1 frame corner(s) confirmed
+============================================================
+
+============================================================
+[Piece 2] Frame corner detection
+  Outer corners : 9
+  All segments  : 12 (11 straight)
+  Centroid      : (490, 450)
+  Angle tol     : ±15.0°
+
+  [0] Corner (np.int64(810), np.int64(101))
+    C1 Connection   : PASS  (prev=True, next=True)
+    C2 Angle        : PASS  (92.7°, need 75°–105°)
+    C3 Inward arrow : PASS
+    C4 Forbidden zones: FAIL  (zone1 hits=7, zone2 hits=0)
+
+  [1] Corner (np.int64(90), np.int64(261))
+    C1 Connection   : PASS  (prev=True, next=True)
+    C2 Angle        : PASS  (90.3°, need 75°–105°)
+    C3 Inward arrow : PASS
+    C4 Forbidden zones: PASS  (zone1 hits=0, zone2 hits=0)
+    >>> FRAME CORNER CONFIRMED
+
+  [2] Corner (np.int64(193), np.int64(738))
+    C1 Connection   : PASS  (prev=True, next=True)
+    C2 Angle        : PASS  (91.7°, need 75°–105°)
+    C3 Inward arrow : PASS
+    C4 Forbidden zones: FAIL  (zone1 hits=0, zone2 hits=47)
+
+  [3] Corner (np.int64(509), np.int64(838))
+    C1 Connection   : PASS  (prev=True, next=True)
+    C2 Angle        : PASS  (93.1°, need 75°–105°)
+    C3 Inward arrow : PASS
+    C4 Forbidden zones: FAIL  (zone1 hits=19, zone2 hits=0)
+
+  [4] Corner (np.int64(675), np.int64(808))
+    C1 Connection   : PASS  (prev=True, next=True)
+    C2 Angle        : PASS  (90.9°, need 75°–105°)
+    C3 Inward arrow : PASS
+    C4 Forbidden zones: FAIL  (zone1 hits=0, zone2 hits=24)
+
+  [5] Corner (np.int64(920), np.int64(583))
+    C1 Connection   : PASS  (prev=True, next=True)
+    C2 Angle        : PASS  (87.6°, need 75°–105°)
+    C3 Inward arrow : PASS
+    C4 Forbidden zones: FAIL  (zone1 hits=40, zone2 hits=27)
+
+  [6] Corner (np.int64(878), np.int64(427))
+    C1 Connection   : FAIL  (prev=True, next=False)
+
+  [7] Corner (np.int64(696), np.int64(301))
+    C1 Connection   : PASS  (prev=True, next=True)
+    C2 Angle        : PASS  (92.4°, need 75°–105°)
+    C3 Inward arrow : FAIL
+
+  [8] Corner (np.int64(854), np.int64(263))
+    C1 Connection   : PASS  (prev=True, next=True)
+    C2 Angle        : PASS  (88.3°, need 75°–105°)
+    C3 Inward arrow : FAIL
+
+  Result: 1 frame corner(s) confirmed
+============================================================
+
+============================================================
+[Piece 3] Frame corner detection
+  Outer corners : 9
+  All segments  : 12 (8 straight)
+  Centroid      : (1808, 395)
+  Angle tol     : ±15.0°
+
+  [0] Corner (np.int64(1363), np.int64(150))
+    C1 Connection   : FAIL  (prev=False, next=True)
+
+  [1] Corner (np.int64(1306), np.int64(291))
+    C1 Connection   : FAIL  (prev=True, next=False)
+
+  [2] Corner (np.int64(1401), np.int64(511))
+    C1 Connection   : PASS  (prev=True, next=True)
+    C2 Angle        : PASS  (92.3°, need 75°–105°)
+    C3 Inward arrow : PASS
+    C4 Forbidden zones: FAIL  (zone1 hits=79, zone2 hits=19)
+
+  [3] Corner (np.int64(1651), np.int64(613))
+    C1 Connection   : FAIL  (prev=True, next=False)
+
+  [4] Corner (np.int64(1724), np.int64(473))
+    C1 Connection   : FAIL  (prev=False, next=True)
+
+  [5] Corner (np.int64(1818), np.int64(682))
+    C1 Connection   : PASS  (prev=True, next=True)
+    C2 Angle        : PASS  (91.2°, need 75°–105°)
+    C3 Inward arrow : FAIL
+
+  [6] Corner (np.int64(2089), np.int64(784))
+    C1 Connection   : PASS  (prev=True, next=True)
+    C2 Angle        : PASS  (91.2°, need 75°–105°)
+    C3 Inward arrow : PASS
+    C4 Forbidden zones: FAIL  (zone1 hits=16, zone2 hits=0)
+
+  [7] Corner (np.int64(2272), np.int64(328))
+    C1 Connection   : PASS  (prev=True, next=True)
+    C2 Angle        : PASS  (90.3°, need 75°–105°)
+    C3 Inward arrow : PASS
+    C4 Forbidden zones: PASS  (zone1 hits=0, zone2 hits=0)
+    >>> FRAME CORNER CONFIRMED
+
+  [8] Corner (np.int64(1597), np.int64(53))
+    C1 Connection   : FAIL  (prev=True, next=False)
+
+  Result: 1 frame corner(s) confirmed
+============================================================
+  Piece 0: type=corner  straight=11  frame_corners=1
+  Piece 1: type=corner  straight=9  frame_corners=1
+  Piece 2: type=corner  straight=11  frame_corners=1
+  Piece 3: type=corner  straight=8  frame_corners=1
+  [OUT] classified.png
+  [OUT] debug.png
+  [OUT] outside_segments.png
+
+============================================================
+  STEP 1: Define puzzle frame
+============================================================
+  [OK] Frame: 190.0mm wide x 128.0mm tall
+  [OK] Scale: 7.7138 px/mm  (from 2291px / 297mm)
+
+============================================================
+  STEP 2: Extract border info per piece
+============================================================
+  Piece 0:
+    outside segments : 3
+      seg P0S7:   63.0 mm
+      seg P0S8:   95.3 mm
+      seg P0S11:   19.8 mm
+    corner pairs     : 1
+      pair 0: seg P0S7 (63.0mm) + seg P0S8 (95.3mm)
+    total outside    : 178.1 mm
+  Piece 1:
+    outside segments : 3
+      seg P1S2:   18.9 mm
+      seg P1S5:   63.2 mm
+      seg P1S6:   95.6 mm
+    corner pairs     : 1
+      pair 0: seg P1S5 (63.2mm) + seg P1S6 (95.6mm)
+    total outside    : 177.7 mm
+  Piece 2:
+    outside segments : 3
+      seg P2S0:   95.6 mm
+      seg P2S1:   63.3 mm
+      seg P2S4:   21.9 mm
+    corner pairs     : 1
+      pair 0: seg P2S0 (95.6mm) + seg P2S1 (63.3mm)
+    total outside    : 180.7 mm
+  Piece 3:
+    outside segments : 3
+      seg P3S0:   19.7 mm
+      seg P3S8:   63.7 mm
+      seg P3S9:   94.5 mm
+    corner pairs     : 1
+      pair 0: seg P3S8 (63.7mm) + seg P3S9 (94.5mm)
+    total outside    : 177.9 mm
+
+  Grand total outside : 714.5 mm
+  Expected perimeter  : 636.0 mm
+  [OK] 4 pieces processed
+
+============================================================
+  STEP 3: Generate variants per piece
+============================================================
+  Piece 0: 4 variant(s)
+    [corner] P0S7 + P0S8  (63.0mm + 95.3mm  = 158.3mm)
+    [edge]   P0S7  (63.0mm)
+    [edge]   P0S8  (95.3mm)
+    [edge]   P0S11  (19.8mm)
+  Piece 1: 4 variant(s)
+    [corner] P1S5 + P1S6  (63.2mm + 95.6mm  = 158.8mm)
+    [edge]   P1S2  (18.9mm)
+    [edge]   P1S5  (63.2mm)
+    [edge]   P1S6  (95.6mm)
+  Piece 2: 4 variant(s)
+    [corner] P2S0 + P2S1  (95.6mm + 63.3mm  = 158.9mm)
+    [edge]   P2S0  (95.6mm)
+    [edge]   P2S1  (63.3mm)
+    [edge]   P2S4  (21.9mm)
+  Piece 3: 4 variant(s)
+    [corner] P3S8 + P3S9  (63.7mm + 94.5mm  = 158.2mm)
+    [edge]   P3S0  (19.7mm)
+    [edge]   P3S8  (63.7mm)
+    [edge]   P3S9  (94.5mm)
+
+  Total variants: 16
+  [OK] 16 total variants across 4 pieces
+
+============================================================
+  STEP 4: Pairwise similarity analysis
+============================================================
+  P0 vs P1: area_diff=0.3%  shape_score=0.3382
+  P0 vs P2: area_diff=1.0%  shape_score=0.3433
+  P0 vs P3: area_diff=1.4%  shape_score=0.0062 *** LIKELY DUPLICATE ***
+  P1 vs P2: area_diff=1.3%  shape_score=0.0056 *** LIKELY DUPLICATE ***
+  P1 vs P3: area_diff=1.7%  shape_score=0.3320
+  P2 vs P3: area_diff=0.4%  shape_score=0.3371
+
+  Likely duplicates found: 2
+    P0 ≈ P3  (score=0.0062)
+    P1 ≈ P2  (score=0.0056)
+  [OK] 6 pairs compared, 2 likely duplicate(s) found
+
+============================================================
+  STEP 5: Constraint configuration
+============================================================
+  C1  Exactly 4 corners — positions: ('TL', 'TR', 'BR', 'BL')
+  C2  Side coverage — top/bottom: 190.0mm ±15.0mm  |  left/right: 128.0mm ±15.0mm
+  C3  Each piece used exactly once
+  C4  Each piece touches the frame
+  C5  Centroid inside frame (corner pieces, margin ±10mm)
+  [OK] Constraints defined — will be applied in Step 6 (tree search)
+
+============================================================
+  STEP 6-debug: Visual placement check (TL + BL per piece)
+============================================================
+  [OUT] dbg_place_P0_TL.png
+  [OUT] dbg_place_P0_BL.png
+  [OUT] dbg_place_P1_TL.png
+  [OUT] dbg_place_P1_BL.png
+  [OUT] dbg_place_P2_TL.png
+  [OUT] dbg_place_P2_BL.png
+  [OUT] dbg_place_P3_TL.png
+  [OUT] dbg_place_P3_BL.png
+  [OK] Step 1 placement images saved (dbg_place_P*)
+  [OUT] dbg_step2_P0_TL_001_P1_corner_INVALID.png
+  [OUT] dbg_step2_P0_TL_002_P1_corner_INVALID.png
+  [OUT] dbg_step2_P0_TL_003_P1_edge_VALID.png
+  [OUT] dbg_step2_P0_TL_004_P1_edge_VALID.png
+  [OUT] dbg_step2_P0_TL_005_P1_edge_VALID.png
+  [OUT] dbg_step2_P0_TL_006_P2_corner_INVALID.png
+  [OUT] dbg_step2_P0_TL_007_P2_corner_INVALID.png
+  [OUT] dbg_step2_P0_TL_008_P2_edge_VALID.png
+  [OUT] dbg_step2_P0_TL_009_P2_edge_VALID.png
+  [OUT] dbg_step2_P0_TL_010_P2_edge_VALID.png
+  [OUT] dbg_step2_P0_TL_011_P3_corner_INVALID.png
+  [OUT] dbg_step2_P0_TL_012_P3_corner_INVALID.png
+  [OUT] dbg_step2_P0_TL_013_P3_edge_VALID.png
+  [OUT] dbg_step2_P0_TL_014_P3_edge_VALID.png
+  [OUT] dbg_step2_P0_TL_015_P3_edge_VALID.png
+  [OUT] dbg_step2_P0_BL_001_P1_corner_INVALID.png
+  [OUT] dbg_step2_P0_BL_002_P1_corner_VALID.png
+  [OUT] dbg_step2_P0_BL_003_P1_edge_VALID.png
+  [OUT] dbg_step2_P0_BL_004_P1_edge_VALID.png
+  [OUT] dbg_step2_P0_BL_005_P1_edge_INVALID.png
+  [OUT] dbg_step2_P0_BL_006_P2_corner_VALID.png
+  [OUT] dbg_step2_P0_BL_007_P2_corner_INVALID.png
+  [OUT] dbg_step2_P0_BL_008_P2_edge_INVALID.png
+  [OUT] dbg_step2_P0_BL_009_P2_edge_VALID.png
+  [OUT] dbg_step2_P0_BL_010_P2_edge_VALID.png
+  [OUT] dbg_step2_P0_BL_011_P3_corner_INVALID.png
+  [OUT] dbg_step2_P0_BL_012_P3_corner_VALID.png
+  [OUT] dbg_step2_P0_BL_013_P3_edge_VALID.png
+  [OUT] dbg_step2_P0_BL_014_P3_edge_VALID.png
+  [OUT] dbg_step2_P0_BL_015_P3_edge_INVALID.png
+  [OUT] dbg_step2_P1_TL_001_P0_corner_INVALID.png
+  [OUT] dbg_step2_P1_TL_002_P0_corner_INVALID.png
+  [OUT] dbg_step2_P1_TL_003_P0_edge_VALID.png
+  [OUT] dbg_step2_P1_TL_004_P0_edge_VALID.png
+  [OUT] dbg_step2_P1_TL_005_P0_edge_VALID.png
+  [OUT] dbg_step2_P1_TL_006_P2_corner_INVALID.png
+  [OUT] dbg_step2_P1_TL_007_P2_corner_INVALID.png
+  [OUT] dbg_step2_P1_TL_008_P2_edge_VALID.png
+  [OUT] dbg_step2_P1_TL_009_P2_edge_VALID.png
+  [OUT] dbg_step2_P1_TL_010_P2_edge_VALID.png
+  [OUT] dbg_step2_P1_TL_011_P3_corner_INVALID.png
+  [OUT] dbg_step2_P1_TL_012_P3_corner_INVALID.png
+  [OUT] dbg_step2_P1_TL_013_P3_edge_VALID.png
+  [OUT] dbg_step2_P1_TL_014_P3_edge_VALID.png
+  [OUT] dbg_step2_P1_TL_015_P3_edge_VALID.png
+  [OUT] dbg_step2_P1_BL_001_P0_corner_INVALID.png
+  [OUT] dbg_step2_P1_BL_002_P0_corner_VALID.png
+  [OUT] dbg_step2_P1_BL_003_P0_edge_VALID.png
+  [OUT] dbg_step2_P1_BL_004_P0_edge_INVALID.png
+  [OUT] dbg_step2_P1_BL_005_P0_edge_VALID.png
+  [OUT] dbg_step2_P1_BL_006_P2_corner_VALID.png
+  [OUT] dbg_step2_P1_BL_007_P2_corner_INVALID.png
+  [OUT] dbg_step2_P1_BL_008_P2_edge_INVALID.png
+  [OUT] dbg_step2_P1_BL_009_P2_edge_VALID.png
+  [OUT] dbg_step2_P1_BL_010_P2_edge_VALID.png
+  [OUT] dbg_step2_P1_BL_011_P3_corner_INVALID.png
+  [OUT] dbg_step2_P1_BL_012_P3_corner_VALID.png
+  [OUT] dbg_step2_P1_BL_013_P3_edge_VALID.png
+  [OUT] dbg_step2_P1_BL_014_P3_edge_VALID.png
+  [OUT] dbg_step2_P1_BL_015_P3_edge_INVALID.png
+  [OUT] dbg_step2_P2_TL_001_P0_corner_INVALID.png
+  [OUT] dbg_step2_P2_TL_002_P0_corner_VALID.png
+  [OUT] dbg_step2_P2_TL_003_P0_edge_VALID.png
+  [OUT] dbg_step2_P2_TL_004_P0_edge_INVALID.png
+  [OUT] dbg_step2_P2_TL_005_P0_edge_VALID.png
+  [OUT] dbg_step2_P2_TL_006_P1_corner_INVALID.png
+  [OUT] dbg_step2_P2_TL_007_P1_corner_VALID.png
+  [OUT] dbg_step2_P2_TL_008_P1_edge_VALID.png
+  [OUT] dbg_step2_P2_TL_009_P1_edge_VALID.png
+  [OUT] dbg_step2_P2_TL_010_P1_edge_INVALID.png
+  [OUT] dbg_step2_P2_TL_011_P3_corner_INVALID.png
+  [OUT] dbg_step2_P2_TL_012_P3_corner_VALID.png
+  [OUT] dbg_step2_P2_TL_013_P3_edge_VALID.png
+  [OUT] dbg_step2_P2_TL_014_P3_edge_VALID.png
+  [OUT] dbg_step2_P2_TL_015_P3_edge_INVALID.png
+  [OUT] dbg_step2_P2_BL_001_P0_corner_INVALID.png
+  [OUT] dbg_step2_P2_BL_002_P0_corner_INVALID.png
+  [OUT] dbg_step2_P2_BL_003_P0_edge_VALID.png
+  [OUT] dbg_step2_P2_BL_004_P0_edge_VALID.png
+  [OUT] dbg_step2_P2_BL_005_P0_edge_VALID.png
+  [OUT] dbg_step2_P2_BL_006_P1_corner_INVALID.png
+  [OUT] dbg_step2_P2_BL_007_P1_corner_INVALID.png
+  [OUT] dbg_step2_P2_BL_008_P1_edge_VALID.png
+  [OUT] dbg_step2_P2_BL_009_P1_edge_VALID.png
+  [OUT] dbg_step2_P2_BL_010_P1_edge_VALID.png
+  [OUT] dbg_step2_P2_BL_011_P3_corner_INVALID.png
+  [OUT] dbg_step2_P2_BL_012_P3_corner_INVALID.png
+  [OUT] dbg_step2_P2_BL_013_P3_edge_VALID.png
+  [OUT] dbg_step2_P2_BL_014_P3_edge_VALID.png
+  [OUT] dbg_step2_P2_BL_015_P3_edge_VALID.png
+  [OUT] dbg_step2_P3_TL_001_P0_corner_INVALID.png
+  [OUT] dbg_step2_P3_TL_002_P0_corner_INVALID.png
+  [OUT] dbg_step2_P3_TL_003_P0_edge_VALID.png
+  [OUT] dbg_step2_P3_TL_004_P0_edge_VALID.png
+  [OUT] dbg_step2_P3_TL_005_P0_edge_VALID.png
+  [OUT] dbg_step2_P3_TL_006_P1_corner_INVALID.png
+  [OUT] dbg_step2_P3_TL_007_P1_corner_INVALID.png
+  [OUT] dbg_step2_P3_TL_008_P1_edge_VALID.png
+  [OUT] dbg_step2_P3_TL_009_P1_edge_VALID.png
+  [OUT] dbg_step2_P3_TL_010_P1_edge_VALID.png
+  [OUT] dbg_step2_P3_TL_011_P2_corner_INVALID.png
+  [OUT] dbg_step2_P3_TL_012_P2_corner_INVALID.png
+  [OUT] dbg_step2_P3_TL_013_P2_edge_VALID.png
+  [OUT] dbg_step2_P3_TL_014_P2_edge_VALID.png
+  [OUT] dbg_step2_P3_TL_015_P2_edge_VALID.png
+  [OUT] dbg_step2_P3_BL_001_P0_corner_INVALID.png
+  [OUT] dbg_step2_P3_BL_002_P0_corner_VALID.png
+  [OUT] dbg_step2_P3_BL_003_P0_edge_VALID.png
+  [OUT] dbg_step2_P3_BL_004_P0_edge_INVALID.png
+  [OUT] dbg_step2_P3_BL_005_P0_edge_VALID.png
+  [OUT] dbg_step2_P3_BL_006_P1_corner_INVALID.png
+  [OUT] dbg_step2_P3_BL_007_P1_corner_VALID.png
+  [OUT] dbg_step2_P3_BL_008_P1_edge_VALID.png
+  [OUT] dbg_step2_P3_BL_009_P1_edge_VALID.png
+  [OUT] dbg_step2_P3_BL_010_P1_edge_INVALID.png
+  [OUT] dbg_step2_P3_BL_011_P2_corner_VALID.png
+  [OUT] dbg_step2_P3_BL_012_P2_corner_INVALID.png
+  [OUT] dbg_step2_P3_BL_013_P2_edge_INVALID.png
+  [OUT] dbg_step2_P3_BL_014_P2_edge_VALID.png
+  [OUT] dbg_step2_P3_BL_015_P2_edge_VALID.png
+  [OK] Step 2 placement images saved (dbg_step2_P*)
+
+############################################################
+  Run complete — outputs in: output\20260311_004211_e3b9/
+############################################################
+
