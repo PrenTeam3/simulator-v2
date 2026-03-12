@@ -95,8 +95,9 @@ Defines `PlacedPiece` and five constraints checked in order (cheapest first):
 
 ### Core idea
 
-Start from a known frame corner (TL or BL), place pieces along the top or bottom side one by one.
-At each step, generate all candidates, evaluate them, and save a debug image for every attempt.
+Start from a known frame corner (TL or BL), place pieces around the frame side by side.
+At each step, generate all candidates, evaluate them, and optionally save a debug image per attempt.
+The search is fully recursive and generic — the same `_search_step` function handles every depth.
 
 ### Key constants (`_placement_types.py`)
 
@@ -106,6 +107,8 @@ At each step, generate all candidates, evaluate them, and save a debug image for
 | `PUZZLE_HEIGHT_MM` | 128.0 | Target length for left/right sides |
 | `_SIDE_TOLERANCE` | 30.0 mm | Allowed error in length matching |
 | `_SECOND_CONFIGS` | `{'TL': ('top', 190, 'TR', True), 'BL': ('bottom', 190, 'BR', True)}` | Config for the first side being filled |
+| `_CORNER_TURN` | 8-entry dict | Maps `(current_side, end_pos)` → `(turn_side, next_side, next_end_pos, next_fwd_is_horiz, next_start_from_end)` for all clockwise and counter-clockwise transitions |
+| `_SIDE_TARGET` | dict | Target length in mm per side name |
 
 ### `Candidate` dataclass
 
@@ -120,13 +123,18 @@ Returned by `_build_candidates`. Fields:
 | `valid` | `bool` | Passes all placement checks |
 | `reason` | `str` | Human-readable explanation |
 | `label` | `str` | Short label for canvas text |
-| `seg_h / seg_v` | `dict \| None` | H/V segments (corner pieces only) |
+| `seg_h / seg_v` | `dict \| None` | H/V segments (corner pieces only) — H is always horizontal, V always vertical |
 | `is_corner` | `bool` | Whether this is a corner variant |
 
 ### Occupancy helpers
 
 `empty_occupancy()` → `{'top': [], 'right': [], 'bottom': [], 'left': []}` where each entry is
 `{'piece_idx', 'seg_id', 'length_mm'}`. Updated via `occ_add()` and `occ_add_candidate()`.
+
+`occ_add_candidate()` takes `fwd_is_horiz` to correctly assign which segment goes along the
+forward side vs the turn side:
+- `fwd_is_horiz=True` (top/bottom): `seg_h` is the forward segment, `seg_v` is the turn segment
+- `fwd_is_horiz=False` (right/left): `seg_v` is the forward segment, `seg_h` is the turn segment
 
 ### Geometry (`_placement_geometry.py`)
 
@@ -138,11 +146,11 @@ Returned by `_build_candidates`. Fields:
 - Places an edge piece so its segment lies along a frame side at `offset_mm`.
 - Tries **0° then 180° rotation** (pure rotation, no mirror/flip), picks whichever puts the
   piece centroid inward (inside the frame).
-- `start_from_end=False` (default): `offset_mm` is measured from the near end of the side
-  (TL/TR for top, TR/BR for right); the segment's **minimum** coordinate is placed at `offset_mm`.
-- `start_from_end=True`: `offset_mm` is measured from the **far end** of the side (BR for right);
+- `start_from_end=False` (default): `offset_mm` is measured from the near end of the side;
+  the segment's **minimum** coordinate is placed at `offset_mm`.
+- `start_from_end=True`: `offset_mm` is measured from the **far end** of the side;
   the segment's **maximum** coordinate is placed at `side_length - offset_mm`.
-  Used when traversing the right side bottom-up (BL→BR→TR path).
+  Used when traversing bottom-up or right-to-left.
 
 **`_build_candidates(..., start_from_end=False)`**
 - Iterates all pieces and variants not already used.
@@ -163,41 +171,41 @@ Returned by `_build_candidates`. Fields:
 - `_draw_legend`: bottom area text showing side occupancy (with `[FULL]` when side is covered)
   and a list of remaining candidate piece indices.
 
-### Visualisation functions (`tree_search.py`)
+### Tree search (`tree_search.py`)
+
+#### `_SearchState` dataclass
+
+Carries all traversal context between recursive calls:
+`used`, `side`, `offset_mm`, `target_mm`, `end_pos`, `fwd_is_horiz`, `start_from_end`,
+`turn_side`, `occ`, `base_canvas`, `ox`, `oy`, `folder`, `prev_color`, `folder_prefix`.
+
+#### `_search_step`
+
+Recursive function. Places one piece at the current depth, saves its image (depending on mode),
+then recurses for each valid candidate. Corner pieces trigger a side-transition via `_CORNER_TURN`;
+edge pieces continue on the same side. Stops at `depth > max_depth`.
 
 #### `visualize_start_placements`
 
 For each piece that has a corner variant, saves `start.png` showing it placed at both TL and BL.
-Shows the piece, its H/V segments, the corner marker, and which pieces could follow.
 
 #### `visualize_second_placements`
 
-For every (first-piece, corner-variant, start-position) combination, generates images for every
-possible second piece:
+Entry point for the recursive search. Sets up piece 1 state and calls `_search_step` starting
+at `depth=2`. Returns `list[str]` of all valid complete branches (always, regardless of mode).
 
-- **Piece 2 canvas**: piece 1 + candidate piece 2 + validity verdict + occupancy legend.
-- Output: `placements/P{1}/{TL|BL}/P{2}/{n:03d}_{type}_{VALID|INVALID}.png`
+**Output mode** (controlled by `mode` parameter in `run.py`):
 
-**Piece 3 — Scenario A** (piece 2 was a valid edge piece):
-- Piece 3 continues along the **same side** (top or bottom).
-- Valid piece 3 must be a corner that closes the side within tolerance.
-- `base_2` canvas shows piece 1 + piece 2; piece 3 is drawn on top.
-- Output: `placements/P{1}/{TL|BL}/P{2}/P{3}/{m:03d}_{type}_{VALID|INVALID}.png`
+| Mode | Images saved | Use case |
+|---|---|---|
+| `console_only` | None | Fast iteration, branch summary only |
+| `valid_only` | Only fully-valid branches (all steps valid to `max_depth`) | Focused review |
+| `all` | Every candidate, valid and invalid | Full debug |
 
-**Piece 3 — Scenario B** (piece 2 was a valid corner piece):
-- Piece 2 is at TR or BR, with a vertical segment (`seg_v`) already covering part of the right side.
-- Piece 3 continues along the **right side**, placed adjacent to piece 2.
-- Parameters depend on which corner piece 2 occupies:
-
-| Start | Piece 2 at | offset_b | target_b | end_b | start_from_end |
-|---|---|---|---|---|---|
-| TL | TR | `seg_v` (from TR, top-down) | 128 mm | BR | False |
-| BL | BR | `seg_v` (from BR, bottom-up) | 128 mm | TR | **True** |
-
-- `start_from_end=True` for the BL case ensures piece 3 is placed **adjacent to piece 2** (just
-  above it on the right side) rather than at the opposite TR corner.
-- Output: `placements/P{1}/{TL|BL}/P{2}/B_P{3}/{m:03d}_{type}_{VALID|INVALID}.png`
-  (`B_` prefix distinguishes Scenario B from Scenario A subfolders).
+**Valid branch summary** is always printed to console at the end of step 6, e.g.:
+```
+P2@TL → P0 edge(45mm) → P3@TR corner(88mm)
+```
 
 ---
 
@@ -212,13 +220,15 @@ output/
             └── P{piece2}/
                 ├── 001_corner_VALID.png
                 ├── 002_edge_INVALID.png
-                ├── P{piece3}/           ← Scenario A (piece 2 was edge, piece 3 on same side)
-                │   ├── 001_corner_VALID.png
+                ├── P{piece3}/       ← piece 3 on same side as piece 2 (piece 2 was edge)
                 │   └── ...
-                └── B_P{piece3}/         ← Scenario B (piece 2 was corner, piece 3 on right side)
-                    ├── 001_edge_VALID.png
-                    └── ...
+                └── B_P{piece3}/     ← piece 3 on new side (piece 2 was corner, B_ = side turn)
+                    ├── P{piece4}/   ← piece 4 on same side as piece 3
+                    └── B_P{piece4}/ ← piece 4 on new side (piece 3 was corner)
 ```
+
+The `B_` prefix on a subfolder means the piece inside it is the **first piece on a new side**
+(i.e. the previous piece was a corner that turned the traversal direction).
 
 ---
 
@@ -228,15 +238,59 @@ output/
 |---|---|
 | Tolerance = 30 mm | Generous to handle real-world measurement noise |
 | Rotation only, no flipping | Physical pieces cannot be flipped; 180° rotation is the correct alternative orientation |
-| Validity logged but not filtered | All candidates saved to disk so invalid ones can be visually inspected |
-| Legend shows piece indices only | Simpler to read than full segment combinations |
+| All candidates traversed | Tree traversal always runs fully; mode only controls what is written to disk |
+| `valid_branches` returned | `visualize_second_placements` returns the branch list for downstream steps (step 7+) |
+| `_CORNER_TURN` lookup table | 8 entries cover all clockwise and counter-clockwise transitions; raising `max_depth` automatically navigates more sides |
+| `fwd_is_horiz` in `occ_add_candidate` | `seg_h`/`seg_v` are geometric (H=horizontal, V=vertical); which one is the *forward* segment depends on the current side's orientation |
 | `[FULL]` marker in legend | Immediately visible when a side is satisfied |
 | Files split ≤ 250 lines each | Easier to navigate; each file has one clear responsibility |
-| `start_from_end` for BL right-side | BL→BR traverses the right side bottom-up; placing at offset=0 (TR) would push pieces outside the frame and look disconnected from piece 2 |
+| `start_from_end` for counter-clockwise traversal | BL→BR→TR traverses the right side bottom-up; offset measured from the far end keeps pieces adjacent to the previous corner |
+
+---
+
+## Fixes (2026-03-12)
+
+### Fix 1 — Wrong offset after side turns (`tree_search.py:219`)
+
+**Root cause**: `seg_h`/`seg_v` are geometric labels (H = horizontal, V = vertical). When a corner
+piece closes a side and the traversal turns, the *turn* segment (the one covering the beginning
+of the next side) is `seg_v` when `fwd_is_horiz=True` but `seg_h` when `fwd_is_horiz=False`.
+The code always used `cand.seg_v['length_mm']`, which was wrong for right/left sides.
+
+**Fix**: `tree_search.py` line 219 changed from:
+```python
+offset_mm=cand.seg_v['length_mm'],
+```
+to:
+```python
+offset_mm=(cand.seg_v if state.fwd_is_horiz else cand.seg_h)['length_mm'],
+```
+
+This correctly selects the turn segment's length as the starting offset on the new side,
+regardless of which axis the current side runs along.
+
+---
+
+### Fix 2 — Segment ruler lines drawn on frame edge, not outside it (`_placement_canvas.py`)
+
+**Root cause**: `_draw_segments` drew the H/V segment lines at their exact puzzle-mm position,
+which lies on the frame edge itself. The lines were visually swallowed by the piece polygon and
+the frame border, making them unreadable.
+
+**Fix**: After transforming each segment endpoint to puzzle-mm space, the midpoint is compared
+against the four frame edges (within `_RULER_MARGIN_MM = 15 mm`). The line is then shifted
+`_RULER_OFFSET_MM = 8 mm` outward into the padding area before drawing. The label moves with it.
+
+---
+
+## Known Issues
+
+*(none currently known)*
 
 ---
 
 ## Pending
 
-- [ ] **Piece 4+**: generalise the search loop to continue around the remaining sides (left side after Scenario B closes at TR/BR).
-- [ ] **Full tree search**: connect visualisation to actual constraint evaluation (`check_all`).
+- [ ] **Step 7**: apply constraint evaluation (`check_all`) against the returned `valid_branches`.
+- [ ] **Full frame search**: raise `max_depth` beyond 3 once placement geometry is verified correct
+  through visual inspection of multi-side traversal outputs.

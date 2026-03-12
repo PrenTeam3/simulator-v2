@@ -54,6 +54,32 @@ class Candidate:
     is_corner: bool
 
 
+# ── Side navigation ───────────────────────────────────────────────────────────
+
+# Maps (current_side, end_pos) → (turn_side, next_side, next_end_pos, next_fwd_is_horiz, next_start_from_end)
+# when a corner piece closes the current side at end_pos.
+_CORNER_TURN: dict[tuple[str, str], tuple[str, str, str, bool, bool]] = {
+    # Clockwise path: TL → TR → BR → BL → TL
+    ('top',    'TR'): ('right',  'right',  'BR', False, False),
+    ('right',  'BR'): ('bottom', 'bottom', 'BL', True,  True ),
+    ('bottom', 'BL'): ('left',   'left',   'TL', False, True ),
+    ('left',   'TL'): ('top',    'top',    'TR', True,  False),
+    # Counter-clockwise path: BL → BR → TR → TL → BL
+    ('bottom', 'BR'): ('right',  'right',  'TR', False, True ),
+    ('right',  'TR'): ('top',    'top',    'TL', True,  True ),
+    ('top',    'TL'): ('left',   'left',   'BL', False, False),
+    ('left',   'BL'): ('bottom', 'bottom', 'BR', True,  False),
+}
+
+# Target length (mm) for each frame side
+_SIDE_TARGET: dict[str, float] = {
+    'top':    PUZZLE_WIDTH_MM,
+    'bottom': PUZZLE_WIDTH_MM,
+    'right':  PUZZLE_HEIGHT_MM,
+    'left':   PUZZLE_HEIGHT_MM,
+}
+
+
 # ── Occupancy helpers ─────────────────────────────────────────────────────────
 
 def empty_occupancy() -> dict[str, list]:
@@ -73,22 +99,29 @@ def occ_add(
 
 
 def occ_add_candidate(
-    occ:       dict[str, list],
-    cand:      Candidate,
-    fwd_side:  str,
-    turn_side: str | None = None,
+    occ:           dict[str, list],
+    cand:          Candidate,
+    fwd_side:      str,
+    turn_side:     str | None = None,
+    fwd_is_horiz:  bool = True,
 ) -> None:
     """Record a placed candidate's segments in the occupancy dict.
 
     Corner candidates contribute to fwd_side and (if given) turn_side.
     Edge candidates contribute only to fwd_side.
+
+    fwd_is_horiz controls which segment goes along the forward side:
+      True  (top/bottom) → seg_h is the forward segment, seg_v is the turn segment
+      False (right/left) → seg_v is the forward segment, seg_h is the turn segment
     """
     if cand.is_corner:
+        seg_fwd  = cand.seg_h if fwd_is_horiz else cand.seg_v
+        seg_turn = cand.seg_v if fwd_is_horiz else cand.seg_h
         occ_add(occ, fwd_side, cand.pv.piece_idx,
-                cand.seg_h['seg_id'], cand.seg_len)
-        if turn_side is not None and cand.seg_v is not None:
+                seg_fwd['seg_id'], cand.seg_len)
+        if turn_side is not None and seg_turn is not None:
             occ_add(occ, turn_side, cand.pv.piece_idx,
-                    cand.seg_v['seg_id'], cand.seg_v['length_mm'])
+                    seg_turn['seg_id'], seg_turn['length_mm'])
     else:
         occ_add(occ, fwd_side, cand.pv.piece_idx,
                 cand.variant.edges[0]['seg_id'], cand.seg_len)

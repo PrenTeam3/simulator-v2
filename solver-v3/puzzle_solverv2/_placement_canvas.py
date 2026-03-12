@@ -90,6 +90,10 @@ def _draw_piece(
                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
 
 
+_RULER_OFFSET_MM: float = 8.0   # how far outside the frame edge to draw segment rulers
+_RULER_MARGIN_MM: float = 15.0  # distance from edge within which a segment midpoint is "on" that side
+
+
 def _draw_segments(
     canvas:    np.ndarray,
     seg_h:     dict,
@@ -99,7 +103,7 @@ def _draw_segments(
     ox:        int,
     oy:        int,
 ) -> None:
-    """Draw the H/V corner segments in contrasting colours."""
+    """Draw the H/V corner segments as rulers shifted outside the frame boundary."""
     result = _corner_transform(seg_h, seg_v, position, px_per_mm)
     if result is None:
         return
@@ -111,11 +115,26 @@ def _draw_segments(
 
     for seg, color, tag in [(seg_h, (0, 220, 255), 'H'), (seg_v, (255, 180, 0), 'V')]:
         p1, p2 = _transform(seg['p1']), _transform(seg['p2'])
-        px1, px2 = _to_px(p1, ox, oy), _to_px(p2, ox, oy)
+        mid_mm = (p1 + p2) / 2.0
+
+        # Shift outward perpendicular to whichever frame side this segment lies on.
+        shift = np.zeros(2)
+        if mid_mm[1] < _RULER_MARGIN_MM:
+            shift[1] = -_RULER_OFFSET_MM                        # top edge → shift up
+        elif mid_mm[1] > PUZZLE_HEIGHT_MM - _RULER_MARGIN_MM:
+            shift[1] = +_RULER_OFFSET_MM                        # bottom edge → shift down
+        elif mid_mm[0] < _RULER_MARGIN_MM:
+            shift[0] = -_RULER_OFFSET_MM                        # left edge → shift left
+        elif mid_mm[0] > PUZZLE_WIDTH_MM - _RULER_MARGIN_MM:
+            shift[0] = +_RULER_OFFSET_MM                        # right edge → shift right
+
+        p1s, p2s = p1 + shift, p2 + shift
+        px1, px2  = _to_px(p1s, ox, oy), _to_px(p2s, ox, oy)
         cv2.line(canvas, px1, px2, color, 3)
-        mid = ((px1[0] + px2[0]) // 2, (px1[1] + px2[1]) // 2)
+        ms = (p1s + p2s) / 2.0
+        mx, my = _to_px(ms, ox, oy)
         cv2.putText(canvas, f"{tag}:{seg['seg_id']} {seg['length_mm']:.0f}mm",
-                    (mid[0] + 4, mid[1] - 4), cv2.FONT_HERSHEY_SIMPLEX, 0.4, color, 1)
+                    (mx + 4, my - 4), cv2.FONT_HERSHEY_SIMPLEX, 0.4, color, 1)
 
 
 def _mark_corner(

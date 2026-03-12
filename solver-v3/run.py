@@ -226,8 +226,12 @@ log_step("6-debug", "Visual placement check (TL + BL per piece)")
 visualize_start_placements(pieces_border, pieces_variants, corners_list, frame, output_dir)
 log_ok("Step 1 placement images saved (dbg_place_P*)")
 
-visualize_second_placements(pieces_variants, corners_list, frame, output_dir)
-log_ok("Step 2 placement images saved (dbg_step2_P*)")
+valid_branches = visualize_second_placements(
+    pieces_variants, corners_list, frame, output_dir,
+    mode='all',        # 'console_only' | 'valid_only' | 'all'
+    max_depth=4,
+)
+log_ok(f"Placement search done — {len(valid_branches)} valid branch(es) found")
 
 
 
