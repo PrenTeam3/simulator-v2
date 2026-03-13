@@ -13,7 +13,11 @@ from puzzle_solverv2._placement_canvas import CANVAS_PX_PER_MM
 # ── Overlays ──────────────────────────────────────────────────────────────────
 
 def _draw_verdict(canvas: np.ndarray, valid: bool, reason: str) -> None:
-    """Stamp a large VALID / INVALID banner in the top-right corner."""
+    """Stamp a VALID / INVALID banner in the top-right corner.
+
+    The reason string is split on double-spaces into separate lines so each
+    metric (length, diff, overlap) is readable on its own row.
+    """
     h, w = canvas.shape[:2]
     text  = "VALID"   if valid else "INVALID"
     color = (0, 220, 80) if valid else (0, 60, 220)
@@ -21,8 +25,12 @@ def _draw_verdict(canvas: np.ndarray, valid: bool, reason: str) -> None:
                 cv2.FONT_HERSHEY_SIMPLEX, 1.4, (255, 255, 255), 6)
     cv2.putText(canvas, text, (w - 220, 50),
                 cv2.FONT_HERSHEY_SIMPLEX, 1.4, color, 3)
-    cv2.putText(canvas, reason, (w - 350, 75),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.38, color, 1)
+    parts = [p.strip() for p in reason.split('  ') if p.strip()]
+    x, y  = w - 350, 75
+    for part in parts:
+        cv2.putText(canvas, part, (x, y),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.38, color, 1)
+        y += 16
 
 
 def _draw_progress_bar(

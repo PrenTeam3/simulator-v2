@@ -211,13 +211,13 @@ def _build_candidates(
                     cen = np.mean(placed, axis=0)
                     if not (0 <= cen[0] <= PUZZLE_WIDTH_MM and 0 <= cen[1] <= PUZZLE_HEIGHT_MM):
                         valid, reason = False, f"centroid ({cen[0]:.0f},{cen[1]:.0f})mm outside frame"
-                if valid and placed_contours:
-                    for prev in placed_contours:
-                        overlap = _polygon_overlap_mm2(placed, prev)
-                        if overlap > MAX_OVERLAP_MM2:
-                            valid  = False
-                            reason = f"overlap {overlap:.0f}mm² > {MAX_OVERLAP_MM2:.0f}mm² limit"
-                            break
+                if placed_contours:
+                    max_overlap = max(_polygon_overlap_mm2(placed, p) for p in placed_contours)
+                    if max_overlap > MAX_OVERLAP_MM2:
+                        valid  = False
+                        reason = f"overlap {max_overlap:.0f}/{MAX_OVERLAP_MM2:.0f}mm²  {reason}"
+                    else:
+                        reason = f"{reason}  overlap={max_overlap:.0f}/{MAX_OVERLAP_MM2:.0f}mm²"
                 results.append(Candidate(
                     pv=pv, variant=v, placed_mm=placed, seg_len=seg['length_mm'],
                     valid=valid, reason=reason,
@@ -246,13 +246,13 @@ def _build_candidates(
                         cen = np.mean(placed, axis=0)
                         if not (0 <= cen[0] <= PUZZLE_WIDTH_MM and 0 <= cen[1] <= PUZZLE_HEIGHT_MM):
                             valid, reason = False, f"centroid ({cen[0]:.0f},{cen[1]:.0f})mm outside frame"
-                    if valid and placed_contours:
-                        for prev in placed_contours:
-                            overlap = _polygon_overlap_mm2(placed, prev)
-                            if overlap > MAX_OVERLAP_MM2:
-                                valid  = False
-                                reason = f"overlap {overlap:.0f}mm² > {MAX_OVERLAP_MM2:.0f}mm² limit"
-                                break
+                    if placed_contours:
+                        max_overlap = max(_polygon_overlap_mm2(placed, p) for p in placed_contours)
+                        if max_overlap > MAX_OVERLAP_MM2:
+                            valid  = False
+                            reason = f"overlap {max_overlap:.0f}/{MAX_OVERLAP_MM2:.0f}mm²  {reason}"
+                        else:
+                            reason = f"{reason}  overlap={max_overlap:.0f}/{MAX_OVERLAP_MM2:.0f}mm²"
                     results.append(Candidate(
                         pv=pv, variant=v, placed_mm=placed, seg_len=fwd['length_mm'],
                         valid=valid, reason=reason,
