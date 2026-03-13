@@ -159,9 +159,9 @@ def visualize_second_placements(
         occ_add(occ_1, side_name, pv.piece_idx, seg_h['seg_id'], seg_h['length_mm'])
         occ_add(occ_1, 'left',    pv.piece_idx, seg_v['seg_id'], seg_v['length_mm'])
 
+        placed_mm_1 = _place_contour(contour, seg_h, seg_v, position, frame.px_per_mm)
         if mode != 'console_only':
             base_1, ox, oy = _make_canvas()
-            placed_mm_1 = _place_contour(contour, seg_h, seg_v, position, frame.px_per_mm)
             _draw_piece(base_1, placed_mm_1, ox, oy, color_1, f"P{pv.piece_idx}@{position}")
             _draw_segments(base_1, seg_h, seg_v, position, frame.px_per_mm, ox, oy)
             _mark_corner(base_1, position, ox, oy)
@@ -181,20 +181,21 @@ def visualize_second_placements(
 
         _search_step(
             _SearchState(
-                used=          {pv.piece_idx},
-                side=          side_name,
-                offset_mm=     seg_h['length_mm'],
-                target_mm=     target,
-                end_pos=       end_pos,
-                fwd_is_horiz=  fwd_is_horiz,
-                start_from_end=False,
-                turn_side=     turn_side,
-                occ=           occ_1,
-                base_canvas=   base_1,
+                used=            {pv.piece_idx},
+                side=            side_name,
+                offset_mm=       seg_h['length_mm'],
+                target_mm=       target,
+                end_pos=         end_pos,
+                fwd_is_horiz=    fwd_is_horiz,
+                start_from_end=  False,
+                turn_side=       turn_side,
+                occ=             occ_1,
+                base_canvas=     base_1,
                 ox=ox, oy=oy,
-                folder=        folder,
-                prev_color=    color_1,
-                folder_prefix= 'P',
+                folder=          folder,
+                prev_color=      color_1,
+                placed_contours= [placed_mm_1],
+                folder_prefix=   'P',
             ),
             cfg, depth=2,
             path=[f"P{pv.piece_idx}@{position}"],

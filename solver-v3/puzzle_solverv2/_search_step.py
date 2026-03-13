@@ -101,6 +101,7 @@ def _build_next_state(
             ox=state.ox, oy=state.oy,
             folder=piece_folder,
             prev_color=color,
+            placed_contours=state.placed_contours + [cand.placed_mm],
             folder_prefix='B_P',
         )
     else:
@@ -118,6 +119,7 @@ def _build_next_state(
             ox=state.ox, oy=state.oy,
             folder=piece_folder,
             prev_color=color,
+            placed_contours=state.placed_contours + [cand.placed_mm],
             folder_prefix='P',
         )
 
@@ -150,6 +152,7 @@ def _search_step(
         cfg.frame.px_per_mm, state.side, state.offset_mm,
         state.target_mm, state.end_pos, state.fwd_is_horiz,
         cfg.tolerance, state.start_from_end,
+        placed_contours=state.placed_contours,
     )
 
     for n, cand in enumerate(candidates, 1):

@@ -22,6 +22,7 @@ import numpy as np
 
 from puzzle_solverv2.frame import PuzzleFrame, PUZZLE_WIDTH_MM, PUZZLE_HEIGHT_MM
 from puzzle_solverv2.variants import Variant
+from puzzle_solverv2.config import SIDE_TOLERANCE_MM
 
 
 # ─────────────────────────────────────────────
@@ -29,7 +30,7 @@ from puzzle_solverv2.variants import Variant
 # ─────────────────────────────────────────────
 
 POSITIONS      = ('TL', 'TR', 'BR', 'BL')
-SIDE_TOLERANCE = 15.0   # mm — ±15mm per side (from algorithm doc)
+SIDE_TOLERANCE = SIDE_TOLERANCE_MM
 
 # Expected horizontal direction per position (in puzzle mm coords)
 _EXPECTED_HORIZ = {

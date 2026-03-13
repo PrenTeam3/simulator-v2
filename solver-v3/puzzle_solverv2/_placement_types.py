@@ -8,6 +8,7 @@ from typing import Any
 import numpy as np
 
 from puzzle_solverv2.frame import PUZZLE_WIDTH_MM, PUZZLE_HEIGHT_MM
+from puzzle_solverv2.config import SIDE_TOLERANCE_MM
 
 
 # ── Frame corner positions (mm) ───────────────────────────────────────────────
@@ -28,7 +29,7 @@ _EXPECTED_HORIZ: dict[str, np.ndarray] = {
 }
 
 # Allowed length error (mm) for side-filling and full-side checks
-_SIDE_TOLERANCE: float = 30.0
+_SIDE_TOLERANCE: float = SIDE_TOLERANCE_MM
 
 # For each start corner: (side_name, target_mm, closing_corner, fwd_is_horiz)
 _SECOND_CONFIGS: dict[str, tuple[str, float, str, bool]] = {

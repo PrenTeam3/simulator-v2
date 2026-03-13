@@ -37,6 +37,7 @@ class _SearchState:
     base_canvas:    Any          # np.ndarray accumulated so far (None in console_only)
     ox:             int
     oy:             int
-    folder:         Path         # parent folder for this depth's output files
-    prev_color:     tuple        # color of the last placed piece
-    folder_prefix:  str = 'P'   # 'B_P' when this is the first piece on a new side
+    folder:          Path         # parent folder for this depth's output files
+    prev_color:      tuple        # color of the last placed piece
+    placed_contours: list         # list[np.ndarray] of already-placed contours in puzzle-mm
+    folder_prefix:   str = 'P'   # 'B_P' when this is the first piece on a new side

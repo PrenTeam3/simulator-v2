@@ -6,7 +6,10 @@ import math
 
 import numpy as np
 
+import cv2
+
 from puzzle_solverv2.frame import PUZZLE_WIDTH_MM, PUZZLE_HEIGHT_MM
+from puzzle_solverv2.config import MAX_OVERLAP_MM2
 from puzzle_solverv2._placement_types import (
     Candidate,
     _EXPECTED_HORIZ,
@@ -135,22 +138,52 @@ def _place_contour_on_side(
     return placed
 
 
+_OVERLAP_SCALE = 2  # px per mm for rasterised overlap check (coarse but fast)
+
+
+def _polygon_overlap_mm2(poly_a: np.ndarray, poly_b: np.ndarray) -> float:
+    """Return the approximate overlap area (mm²) between two polygons.
+
+    Uses rasterisation at _OVERLAP_SCALE px/mm so no external dependency is needed.
+    """
+    all_pts = np.vstack([poly_a, poly_b])
+    min_xy  = all_pts.min(axis=0) - 1.0
+
+    def to_px(poly: np.ndarray) -> np.ndarray:
+        return ((poly - min_xy) * _OVERLAP_SCALE).astype(np.int32)
+
+    pts_a = to_px(poly_a)
+    pts_b = to_px(poly_b)
+    size  = to_px(all_pts).max(axis=0) + 2
+    h, w  = int(size[1]), int(size[0])
+
+    mask_a = np.zeros((h, w), dtype=np.uint8)
+    mask_b = np.zeros((h, w), dtype=np.uint8)
+    cv2.fillPoly(mask_a, [pts_a], 1)
+    cv2.fillPoly(mask_b, [pts_b], 1)
+
+    overlap_px = int(np.count_nonzero(mask_a & mask_b))
+    return overlap_px / (_OVERLAP_SCALE * _OVERLAP_SCALE)
+
+
 def _build_candidates(
-    pieces_variants: list,
-    used_idxs:       set[int],
-    corners_list:    list[dict],
-    px_per_mm:       float,
-    side_name:       str,
-    offset_mm:       float,
-    target:          float,
-    end_pos:         str,
-    fwd_is_horiz:    bool,
-    tolerance:       float,
-    start_from_end:  bool = False,
+    pieces_variants:  list,
+    used_idxs:        set[int],
+    corners_list:     list[dict],
+    px_per_mm:        float,
+    side_name:        str,
+    offset_mm:        float,
+    target:           float,
+    end_pos:          str,
+    fwd_is_horiz:     bool,
+    tolerance:        float,
+    start_from_end:   bool = False,
+    placed_contours:  list | None = None,
 ) -> list[Candidate]:
     """Return all next-piece candidates for a given side/offset.
 
-    Excludes pieces in used_idxs and applies length + centroid validity checks.
+    Excludes pieces in used_idxs and applies length, centroid, and overlap checks.
+    placed_contours: list of already-placed contours (puzzle-mm) for overlap detection.
     """
     results: list[Candidate] = []
 
@@ -178,6 +211,13 @@ def _build_candidates(
                     cen = np.mean(placed, axis=0)
                     if not (0 <= cen[0] <= PUZZLE_WIDTH_MM and 0 <= cen[1] <= PUZZLE_HEIGHT_MM):
                         valid, reason = False, f"centroid ({cen[0]:.0f},{cen[1]:.0f})mm outside frame"
+                if valid and placed_contours:
+                    for prev in placed_contours:
+                        overlap = _polygon_overlap_mm2(placed, prev)
+                        if overlap > MAX_OVERLAP_MM2:
+                            valid  = False
+                            reason = f"overlap {overlap:.0f}mm² > {MAX_OVERLAP_MM2:.0f}mm² limit"
+                            break
                 results.append(Candidate(
                     pv=pv, variant=v, placed_mm=placed, seg_len=seg['length_mm'],
                     valid=valid, reason=reason,
@@ -206,6 +246,13 @@ def _build_candidates(
                         cen = np.mean(placed, axis=0)
                         if not (0 <= cen[0] <= PUZZLE_WIDTH_MM and 0 <= cen[1] <= PUZZLE_HEIGHT_MM):
                             valid, reason = False, f"centroid ({cen[0]:.0f},{cen[1]:.0f})mm outside frame"
+                    if valid and placed_contours:
+                        for prev in placed_contours:
+                            overlap = _polygon_overlap_mm2(placed, prev)
+                            if overlap > MAX_OVERLAP_MM2:
+                                valid  = False
+                                reason = f"overlap {overlap:.0f}mm² > {MAX_OVERLAP_MM2:.0f}mm² limit"
+                                break
                     results.append(Candidate(
                         pv=pv, variant=v, placed_mm=placed, seg_len=fwd['length_mm'],
                         valid=valid, reason=reason,
