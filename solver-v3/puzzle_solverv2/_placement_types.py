@@ -51,7 +51,6 @@ class Candidate:
     label:     str
     seg_h:     dict | None   # horizontal segment (corner pieces only)
     seg_v:     dict | None   # vertical  segment (corner pieces only)
-    is_corner: bool
 
 
 # ── Side navigation ───────────────────────────────────────────────────────────
@@ -114,7 +113,7 @@ def occ_add_candidate(
       True  (top/bottom) → seg_h is the forward segment, seg_v is the turn segment
       False (right/left) → seg_v is the forward segment, seg_h is the turn segment
     """
-    if cand.is_corner:
+    if cand.variant.type == 'corner':
         seg_fwd  = cand.seg_h if fwd_is_horiz else cand.seg_v
         seg_turn = cand.seg_v if fwd_is_horiz else cand.seg_h
         occ_add(occ, fwd_side, cand.pv.piece_idx,

@@ -182,7 +182,7 @@ def _build_candidates(
                     pv=pv, variant=v, placed_mm=placed, seg_len=seg['length_mm'],
                     valid=valid, reason=reason,
                     label=f"P{pv.piece_idx} edge {seg['seg_id']}({seg['length_mm']:.0f}mm)",
-                    seg_h=None, seg_v=None, is_corner=False,
+                    seg_h=None, seg_v=None,
                 ))
 
             elif v.type == 'corner' and len(v.edges) >= 2:
@@ -211,7 +211,7 @@ def _build_candidates(
                         valid=valid, reason=reason,
                         label=(f"P{pv.piece_idx}@{end_pos} ori{ori_n}"
                                f" fwd={fwd['seg_id']}({fwd['length_mm']:.0f}mm)"),
-                        seg_h=sh, seg_v=sv, is_corner=True,
+                        seg_h=sh, seg_v=sv,
                     ))
 
     return results

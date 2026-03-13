@@ -289,8 +289,52 @@ against the four frame edges (within `_RULER_MARGIN_MM = 15 mm`). The line is th
 
 ---
 
+## Step 7 — Constraint Validation (`run.py`, `tree_search.py`)
+
+### What was built
+
+Step 7 applies `check_all()` from `constraints.py` to every valid branch produced by Step 6,
+without reconstructing anything. The `PlacedPiece` objects are built **during** the tree search
+and carried forward, so Step 7 is a pure post-processing loop.
+
+### Changes
+
+**`tree_search.py`**
+
+- Added `from puzzle_solverv2.constraints import PlacedPiece`.
+- `_search_step` gains two new parameters:
+  - `placed: list` — the `list[PlacedPiece]` accumulated so far along the current branch.
+  - `centroid_by_idx: dict` — lookup `{piece_idx: centroid_px}` built once from `pieces_border`.
+- At each valid candidate a `PlacedPiece` is constructed inline and appended → `next_placed`.
+- `results` changed from `list[str]` to `list[tuple[str, list[PlacedPiece]]]`; at `depth == max_depth`
+  both the branch string and the full placed list are stored.
+- `visualize_second_placements` gains a `pieces_border` parameter (optional, defaults to `None`).
+  It builds `centroid_by_idx`, creates the initial `PlacedPiece` for piece 1 (the starting corner),
+  and now returns `list[tuple[str, list]]` instead of `list[str]`.
+- The summary print loop updated to unpack `(branch_str, _)`.
+
+**`run.py`**
+
+- Imports `check_all` from `puzzle_solverv2.constraints`.
+- Passes `pieces_border=pieces_border` to `visualize_second_placements`.
+- New **Step 7** block:
+  ```python
+  for branch_str, placed in valid_branches:
+      ok, reason = check_all(placed, frame, total_pieces)
+      if ok:   log_ok(f"PASS: {branch_str}")
+      else:    log(f"FAIL [{reason}]: {branch_str}")
+  ```
+  Prints `N / M branch(es) passed all constraints` at the end.
+
+### Design note
+
+`PlacedPiece` objects are built once during the search (no re-running of placements).
+Each recursive call extends the immutable `placed + [new_piece]` list, so backtracking is
+naturally correct — sibling branches get independent copies.
+
+---
+
 ## Pending
 
-- [ ] **Step 7**: apply constraint evaluation (`check_all`) against the returned `valid_branches`.
 - [ ] **Full frame search**: raise `max_depth` beyond 3 once placement geometry is verified correct
   through visual inspection of multi-side traversal outputs.

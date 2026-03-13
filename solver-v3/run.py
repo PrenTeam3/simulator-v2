@@ -11,45 +11,9 @@ from puzzle_solverv2.frame import build_frame
 from puzzle_solverv2.border_info import extract_border_info, log_border_info
 from puzzle_solverv2.variants import generate_variants, log_variants
 from puzzle_solverv2.similarity import analyze_similarity, log_similarity
-from puzzle_solverv2.constraints import log_constraints
+from puzzle_solverv2.constraints import log_constraints, check_all
 from puzzle_solverv2.tree_search import visualize_start_placements, visualize_second_placements
-
-
-# ─────────────────────────────────────────────
-#  Tee — write stdout to console AND log file
-# ─────────────────────────────────────────────
-
-class _Tee:
-    def __init__(self, *streams):
-        self._streams = streams
-    def write(self, data):
-        for s in self._streams:
-            s.write(data)
-    def flush(self):
-        for s in self._streams:
-            s.flush()
-
-
-# ─────────────────────────────────────────────
-#  Logging helper
-# ─────────────────────────────────────────────
-
-def log_step(number, title):
-    print(f"\n{'='*60}")
-    print(f"  STEP {number}: {title}")
-    print(f"{'='*60}")
-
-def log(msg):
-    print(f"  {msg}")
-
-def log_ok(msg):
-    print(f"  [OK] {msg}")
-
-def log_err(msg):
-    print(f"  [ERROR] {msg}")
-
-def log_out(path):
-    print(f"  [OUT] {path}")
+from utils import _Tee, log_step, log, log_ok, log_err, log_out
 
 
 # ─────────────────────────────────────────────
@@ -218,7 +182,7 @@ log_ok("Constraints defined — will be applied in Step 6 (tree search)")
 
 
 # ─────────────────────────────────────────────
-#  [Solver v2] Step 6 debug — Visual placement check
+#  [Solver v2] Step 6 — Visual placement check
 # ─────────────────────────────────────────────
 
 log_step("6-debug", "Visual placement check (TL + BL per piece)")
@@ -228,11 +192,31 @@ log_ok("Step 1 placement images saved (dbg_place_P*)")
 
 valid_branches = visualize_second_placements(
     pieces_variants, corners_list, frame, output_dir,
+    pieces_border=pieces_border,
     mode='all',        # 'console_only' | 'valid_only' | 'all'
     max_depth=4,
 )
 log_ok(f"Placement search done — {len(valid_branches)} valid branch(es) found")
 
+
+# ─────────────────────────────────────────────
+#  [Solver v2] Step 7 — Constraint validation
+# ─────────────────────────────────────────────
+
+log_step(7, "Constraint validation of valid branches")
+
+total_pieces = len(pieces_variants)
+confirmed = []
+
+for branch_str, placed in valid_branches:
+    ok, reason = check_all(placed, frame, total_pieces)
+    if ok:
+        confirmed.append(branch_str)
+        log_ok(f"PASS: {branch_str}")
+    else:
+        log(f"FAIL [{reason}]: {branch_str}")
+
+log_ok(f"{len(confirmed)} / {len(valid_branches)} branch(es) passed all constraints")
 
 
 # ─────────────────────────────────────────────
